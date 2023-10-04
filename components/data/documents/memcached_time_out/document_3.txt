@@ -1,0 +1,346 @@
+php - Timeout faster \w memcache - Stack Overflow
+Stack Overflow
+About
+						Products
+					
+For Teams
+Stack Overflow
+Public questions & answers
+Stack Overflow for Teams
+Where developers & technologists share private knowledge with coworkers
+Talent
+								Build your employer brand
+							
+Advertising
+Reach developers & technologists worldwide
+Labs
+The future of collective knowledge sharing
+About the company
+Loading…
+current community
+            Stack Overflow
+        
+help
+chat
+            Meta Stack Overflow
+        
+your communities            
+Sign up or log in to customize your list.                
+more stack exchange communities
+company blog
+Log in
+Sign up
+                    Home
+                
+Public
+ Questions
+                    Tags
+                
+                    Users
+                
+                    Companies
+                
+Collectives
+Collectives™ on Stack Overflow
+        – Centralized & trusted content around the technologies you use the most.
+        
+        
+ 
+Learn more about Collectives
+ Explore Collectives
+Labs
+ Discussions
+ 
+Teams
+                    Create free Team
+                
+Collectives™ on Stack Overflow
+Find centralized, trusted content and collaborate around the technologies you use most.
+                    Learn more about Collectives
+                
+Teams
+Q&A for work
+Connect and share knowledge within a single location that is structured and easy to search.
+                    Learn more about Teams
+                
+Get early access and see previews of new features.
+Learn more about Labs
+Timeout faster \w memcache
+        Ask Question
+    
+Asked
+12 years, 5 months ago
+Modified
+10 years, 5 months ago
+Viewed
+                        6k times
+                    
+ Part of PHP Collective
+                        
+            5
+        
+I'm trying to force PHP's Memcache extension to timeout almost immediately if a memcached server I'm connecting to isn't available (for whatever reason). I'd like to throw an exception in this case (which will be handled somewhere else).
+I've been searching and trying different things without any luck. I'm adding servers (only one for now) to the pool with the standard:
+$this->memcache->addServer ( $server['host'], $server['port'] );
+I then killed the memcached deamon (also tried with a wrong port&host) and opened my page. It just loads for a very long time and then nginx comes back with a 504 Gateway Time-out error.
+How can I tell the memcache client to try for, I don't know, 1 second and then give up, at which point I should be able to detect the timeout somehow.
+The bottom line is that if our memcached server would be down I'd like to display a user-friendly error page (already working for uncaught exceptions) as soon as possible and not make the user wait for 30 sec before he sees a generic server error.
+phpmemcached
+Share
+Improve this question
+                        Follow
+                    
+edited Apr 23, 2013 at 10:00
+Ankur
+2,1712323 silver badges2929 bronze badges
+        asked Apr 25, 2011 at 15:58
+Jan HančičJan Hančič
+53.3k1717 gold badges9696 silver badges9999 bronze badges
+0
+Add a comment
+ | 
+                                        2 Answers
+                                    2
+            Sorted by:
+        
+            Reset to default
+        
+                        Highest score (default)
+                    
+                        Trending (recent votes count more)
+                    
+                        Date modified (newest first)
+                    
+                        Date created (oldest first)
+                    
+            5
+        
+                +100
+            
+Just call:
+Memcache::getServerStatus() or
+Memcache::getExtendedStats()
+Also, this question is pretty much identical to yours.
+Share
+Improve this answer
+                        Follow
+                    
+edited May 23, 2017 at 11:45
+CommunityBot
+111 silver badge
+        answered Apr 30, 2011 at 13:52
+Alix AxelAlix Axel
+152k9595 gold badges394394 silver badges500500 bronze badges
+Add a comment
+ | 
+            3
+        
+Reduce the the value of max_failover_attempts memcache module configuration parameter, default number is too high.
+You can also specify timeout as 3rd parameter to connect() method:
+$memcache->connect('memcache_host', 11211, $timeout);
+however the default timeout should be already set to 1 second.
+Another place to look are TCP timeout parameters in OS.
+Share
+Improve this answer
+                        Follow
+                    
+edited Apr 25, 2011 at 16:56
+        answered Apr 25, 2011 at 16:29
+vlsvls
+2,3041515 silver badges2020 bronze badges
+3
+1
+I've set it to 1 and the result is the same.
+– Jan Hančič
+Apr 25, 2011 at 16:35
+Jan: memcache connect and pconnect functions accept timeout as 3rd parameter. You can either try setting that or changing tcp timeout parameters in the OS.
+– vls
+Apr 25, 2011 at 16:53
+I tried with the timeout, but like you said it's already set to 1. And MySQL timeouts work just fine. Does it make any difference that memcache is running locally, and MySQL on another server?
+– Jan Hančič
+Apr 26, 2011 at 7:47
+Add a comment
+ | 
+                                    Your Answer
+                                
+Reminder: Answers generated by Artificial Intelligence tools are not allowed on Stack Overflow. Learn more
+Thanks for contributing an answer to Stack Overflow!Please be sure to answer the question. Provide details and share your research!But avoid …Asking for help, clarification, or responding to other answers.Making statements based on opinion; back them up with references or personal experience.To learn more, see our tips on writing great answers.
+Draft saved
+Draft discarded
+Sign up or log in
+ Sign up using Google
+                        
+ Sign up using Facebook
+                        
+ Sign up using Email and Password
+                        
+Submit
+Post as a guest
+Name
+Email
+Required, but never shown
+Post as a guest
+Name
+Email
+Required, but never shown
+                                            Post Your Answer
+                                        
+                                            Discard
+                                        
+                                                By clicking “Post Your Answer”, you agree to our terms of service and acknowledge that you have read and understand our privacy policy and code of conduct.
+Not the answer you're looking for? Browse other questions tagged phpmemcached or ask your own question.                                
+PHP
+Collective
+Join the discussion
+ This question is in a collective: a subcommunity defined by tags with relevant content and experts.
+                                        
+                            Featured on Meta
+                        
+ 
+Alpha test for short survey in banner ad slots starting on week of September...
+ 
+What should be next for community events?
+ 
+Temporary policy: Generative AI (e.g., ChatGPT) is banned
+ 
+Expanding Discussions: Let's talk about curation
+ 
+Update on Collectives and Discussions
+ 
+OverflowAI Search is now available for alpha testing (September 13, 2023)
+Visit chat
+Linked
+5
+PHP memcache - check if any server is available in pool?
+Related
+4
+Memcache in high performance sites with PHP
+3
+how to use Memcache to speed up the PHP?
+3
+PHP speed optimisation
+6
+Is memcached all about timing?
+0
+Cache design and Memcache(d) records with timeouts?
+3
+Memcache get optimization with php
+3
+Memcached Ignoring OPT timeouts
+5
+Memcached Performance
+1
+Performance overhead of short timeouts in Memcached
+3
+Memcached get taking too long to respond
+            Hot Network Questions
+        
+                    Why do Belugas keep executing a go-around?
+                
+                    A Trivial Pursuit #16 (Art and Literature 3/4): X
+                
+                    Does Coolant Actively Circulate Through Overflow Reservoir?
+                
+                    How to create an active tilde in LaTeX 3
+                
+                    Compounding vs Annualizing Returns in a Portfolio Optimization Context
+                
+                    What is this component? It looks like a rectifier with 149k as identifier
+                
+                    When applying for a British visa, is it necessary to supply a translation of the passport?
+                
+                    What kind of telescope would be needed to image a 10m dim object 1 million km away?
+                
+                    Do most conference papers get written last minute?
+                
+                    Can the Debye functions be implemented using built-in functions?
+                
+                    Simplifying quantum circuits
+                
+                    LED circuit seems to defy Ohm's law. Of course it’s something else
+                
+                    The interplanetary cold war
+                
+                    How do I remove this folder from the Windows Explorer navigation bar?
+                
+                    Why doesn't share movement match difference between open and close?
+                
+                    Earth enslaved by aliens. Last sentence of the short story gives added grimness to it
+                
+                    Why are some cards out of collector number sequence in MTG:Lord of the Rings
+                
+                    I irradiate your source code, you irradiate your output
+                
+                    Wiring from meter to panel over longer distances
+                
+                    How did the y get lost in German writing?
+                
+                    When, if any case, can it be considered justifiable to reject a takeoff after V1 speed, if the aircraft is incapable of taking off?
+                
+                    Why is the composition of China's foreign exchange reserves classified information?
+                
+                    Rolling tetrahedra
+                
+                    Identify Duplos that were in the Red Bunny Purse
+                
+            more hot questions
+        
+            Question feed
+        
+                Subscribe to RSS
+            
+                        Question feed
+                        To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+lang-php
+Stack Overflow
+Questions
+Help
+Products
+Teams
+Advertising
+Collectives
+Talent
+Company
+About
+Press
+Work Here
+Legal
+Privacy Policy
+Terms of Service
+Contact Us
+Cookie Settings
+Cookie Policy
+Stack Exchange Network
+                                    Technology
+                                
+                                    Culture & recreation
+                                
+                                    Life & arts
+                                
+                                    Science
+                                
+                                    Professional
+                                
+                                    Business
+                                
+                                    API
+                                
+                                    Data
+                                
+Blog
+Facebook
+Twitter
+LinkedIn
+Instagram
+Site design / logo © 2023 Stack Exchange Inc; user contributions licensed under CC BY-SA.                    rev 2023.10.3.43658
+                        Your privacy
+                    
+                        By clicking “Accept all cookies”, you agree Stack Exchange can store cookies on your device and disclose information in accordance with our Cookie Policy.
+                    
+                            Accept all cookies
+                        
+                            Necessary cookies only
+                        
+                            Customize settings
+                        
+ 

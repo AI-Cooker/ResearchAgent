@@ -4,7 +4,7 @@ from parser import parse_page
 
 # https://docs.python-requests.org/en/master/user/quickstart/#passing-parameters-in-urls
 params = {
-    "q": "upgrade mariadb",  # query example
+    "q": "memcached timed out",  # query example
     "hl": "en",  # language
     # "gl": "uk",  # country of the search, UK -> United Kingdom
     "start": 0,  # number page by default up to 0
@@ -29,7 +29,7 @@ while True:
         params=params,
         headers=headers,
         timeout=30,
-        verify="D:\\Storages\\certs\\tma-ADCA-CA.crt",
+        verify="",
     )
     soup = BeautifulSoup(html.text, "lxml")
     # with open("search_page.html", "w", encoding="utf-8") as f:
