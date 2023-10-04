@@ -1,0 +1,161 @@
+memcached timeout error because of slow responseGroupsConversationsAll groups and messagesSend feedback to GoogleHelpSign inGroups
+memcachedConversationsAboutPrivacy • Terms
+memcached timeout error because of slow response 4161 viewsSkip to first unread messagedl4nerunread,Oct 8, 2010, 7:58:53 PM10/8/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcachedHi,
+ we expirience memcache slow responses. (rare, only 3..5x per 24h)
+I tracked the "mecache timeout errors" down to the following:
+ 36278 13:52:46.020698 192.168.43.129 -> 192.168.43.133 MEMCACHE get
+key
+36299 13:52:46.061557 192.168.43.133 -> 192.168.43.129 TCP memcache >
+47127 [ACK] Seq=1 Ack=75 Win=68 Len=0 TSV=623862695
+40947 13:52:47.024100 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [FIN, ACK] Seq=75 Ack=1 Win=501 Len=0 TSV=324
+41125 13:52:47.061603 192.168.43.133 -> 192.168.43.129 TCP memcache >
+47127 [ACK] Seq=1 Ack=76 Win=68 Len=0 TSV=623862945
+45256 13:52:48.316037 192.168.43.133 -> 192.168.43.129 MEMCACHE VALUE
+key
+ limited during capture]
+45257 13:52:48.316096 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [RST] Seq=76 Win=0 Len=0
+45262 13:52:48.316055 192.168.43.133 -> 192.168.43.129 MEMCACHE
+MEMCACHE Continuation[Packet size limited during capture]
+45263 13:52:48.316134 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [RST] Seq=76 Win=0 Len=0
+ so it is clear: the memcache accepts the "get key", but does not
+respond during the timeout value of 1 second.
+and no, we do not have packet loss here, becaues this is the trace of
+the same time on the memcached server:
+ 34602 13:52:46.021765 192.168.43.129 -> 192.168.43.133 MEMCACHE get
+key
+34606 13:52:46.062537 192.168.43.133 -> 192.168.43.129 TCP memcache >
+47127 [ACK] Seq=1 Ack=75 Win=68 Len=0 TSV=
+38633 13:52:47.025136 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [FIN, ACK] Seq=75 Ack=1 Win=501 Len=
+38745 13:52:47.062530 192.168.43.133 -> 192.168.43.129 TCP memcache >
+47127 [ACK] Seq=1 Ack=76 Win=68 Len=0 TSV=
+40769 13:52:48.316909 192.168.43.133 -> 192.168.43.129 MEMCACHE VALUE
+key
+limited during capture]
+40772 13:52:48.316919 192.168.43.133 -> 192.168.43.129 MEMCACHE
+MEMCACHE Continuation[Packet size limited during
+40785 13:52:48.317124 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [RST] Seq=76 Win=0 Len=0
+40788 13:52:48.317179 192.168.43.129 -> 192.168.43.133 TCP 47127 >
+memcache [RST] Seq=76 Win=0 Len=0
+  now some data:
+memcached-server is running 2.6.31-gentoo-r4, memcache-1.4.5 and a
+mysql instance.
+it is a single quadcore@2.5 GHz w/ 8 GB RAM, about 6 GB free.
+it is configured for 2GB of RAM, and uses about 1300 pages. no
+evictions occure.
+during the time when those sporadically slow responses (I had a trace
+of a 20 second-response for a set command) a lot of other memcache
+requests in the meantime are processed normally.
+the network is a gbit switch, both servers use serverboard with
+onboard gbit nics (intel),
+and the traffic during that is quite low (about 20Mbit/s and 3000
+packets/s on the memcached-server).
+also load and io are low.
+ any hints ?
+ regards.
+ Werner.dormandounread,Oct 9, 2010, 12:02:55 PM10/9/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcached> we expirience memcache slow responses. (rare, only 3..5x per 24h)> I tracked the "mecache timeout errors" down to the following:>[snip]>> now some data:> memcached-server is running 2.6.31-gentoo-r4, memcache-1.4.5 and a> mysql instance.> it is a single quadcore@2.5 GHz w/ 8 GB RAM, about 6 GB free.> it is configured for 2GB of RAM, and uses about 1300 pages. no> evictions occure.> during the time when those sporadically slow responses (I had a trace> of a 20 second-response for a set command) a lot of other memcache> requests in the meantime are processed normally.> the network is a gbit switch, both servers use serverboard with> onboard gbit nics (intel),> and the traffic during that is quite low (about 20Mbit/s and 3000> packets/s on the memcached-server).> also load and io are low.Just for curiousity, what's the client that you're using? It may beinputting some junk data and memcached isn't responding since it thinksit's halfway through a request.http://code.google.com/p/memcached/wiki/Timeouts^ can you use the utility from here and try to have it find some failures?That should help rule out anything to do with protocol errors or otherclient issues.-Dormandodl4nerunread,Oct 11, 2010, 7:10:49 PM10/11/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcachedHi Dormando,
+ > Just for curiousity, what's the client that you're using?
+ pecl/memcache-2.2.5
+and reading http://brian.moonspot.net/php-memcached-issues sounds like sticking to 2.2.5 is a good idea...
+ > It may be inputting some junk data and memcached isn't responding since
+> it thinks it's halfway through a request.
+>
+> http://code.google.com/p/memcached/wiki/Timeouts > ^ can you use the utility from here and try to have it find some failures?
+> That should help rule out anything to do with protocol errors or other
+> client issues.
+ well, I just used this tool to force enough requests :)
+ ok, I extended it a bit, for generating min/max/avg times of the
+processes,
+and for executing an explicit memcache get.
+If you like, You can adopt my patches for redistribution:
+ http://www.maiers.de/memcache/mc_conn_tester.pl  IIRC there was also the same while doing a "get foo", from the
+script,
+but I'll verify this today.
+We'll do a kernel update on the memcache-server today, so I'll test
+after that again.
+ regards.
+ Werner.dormandounread,Oct 11, 2010, 10:07:09 PM10/11/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcached>> well, I just used this tool to force enough requests :)>> ok, I extended it a bit, for generating min/max/avg times of the> processes,> and for executing an explicit memcache get.> If you like, You can adopt my patches for redistribution:>> http://www.maiers.de/memcache/mc_conn_tester.pl>> IIRC there was also the same while doing a "get foo", from the> script,> but I'll verify this today.> We'll do a kernel update on the memcache-server today, so I'll test> after that again.I can't tell from your reply, did the script note failures during the getstage consistently?dl4nerunread,Oct 11, 2010, 10:24:59 PM10/11/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcached On Oct 11, 5:07 pm, dormando <dorma...@ryd
+> > IIRC there was also the same while doing a "get foo", from the
+> > script,
+> > but I'll verify this today.
+> > We'll do a kernel update on the memcache-server today, so I'll test
+> > after that again.
+>
+> I can't tell from your reply, did the script note failures during the get
+> stage consistently?
+ no it dit not. only once per some hours.
+ at the moment my test script it puts out something like
+Averages  : (conn: 0.00028186) (set: 0.00017516) (get: 0.00014979)
+Min       : (conn: 0.00018787) (set: 0.00007915) (get: 0.00005698)
+Max       : (conn: 0.01806998) (set: 0.01937985) (get: 0.02458501)
+Iterations: 1000000 in  653.27 seconds, 1530.76 conn+set+get/per
+second
+ where the limit (1600/s) is cpu power and perl processing on the
+mc_conn_tester.pl host.
+ If I start more processes, the each put out some 1500 per second, even
+on two mc_conn_tester hosts. so I get roundabout 12000/15000 conn+get
++sets
+on the memcache-server (I didn't try to find a maximum there as it is
+production environment).
+ but:
+with new kernel 2.6.34-gentoo-r6, new glibc, new libevent, recompiled
+memcached
+we hat no error so far (at least during the last 3 hours since
+reboot).
+So I hope it is one of these strange "old glibc/libevent/kernel/foo"
+thing...
+ regards,
+ Werner.dormandounread,Oct 11, 2010, 10:31:29 PM10/11/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcached> no it dit not. only once per some hours.>> at the moment my test script it puts out something like> Averages  : (conn: 0.00028186) (set: 0.00017516) (get: 0.00014979)> Min       : (conn: 0.00018787) (set: 0.00007915) (get: 0.00005698)> Max       : (conn: 0.01806998) (set: 0.01937985) (get: 0.02458501)> Iterations: 1000000 in  653.27 seconds, 1530.76 conn+set+get/per> second>> where the limit (1600/s) is cpu power and perl processing on the> mc_conn_tester.pl> host.>> If I start more processes, the each put out some 1500 per second, even> on two mc_conn_tester hosts. so I get roundabout 12000/15000 conn+get> +sets> on the memcache-server (I didn't try to find a maximum there as it is> production environment).>> but:> with new kernel 2.6.34-gentoo-r6, new glibc, new libevent, recompiled> memcached> we hat no error so far (at least during the last 3 hours since> reboot).> So I hope it is one of these strange "old glibc/libevent/kernel/foo"> thing...Ah okay...It wasn't meant to be a benchmark tool. It's meant to poke alongside yourproduction traffic to find failures :PBut yeah, hopefully you fixed it there.dl4nerunread,Oct 27, 2010, 5:11:49 PM10/27/10Reply to authorSign in to reply to authorForwardSign in to forwardDeleteYou do not have permission to delete messages in this groupCopy linkReport message as abuseSign in to report message as abuseShow original messageEither email addresses are anonymous for this group or you need the view member email addresses permission to view the original messageto memcached> But yeah, hopefully you fixed it there.
+ I suppose we finnally found it.
+I guess you might add those points to the timout wiki.
+ The problem seemed to boil down to the following:
+vm.swappiness=60 (default) is a very bad idea, when combined
+with deadline as a io scheduler.
+ symtom:
+- after memcached up some days, timeouts start.
+- after a server reboot, timeouts are gone.
+- after memcache restart, timeouts are gone
+- after memcached up some days, timeouts are back
+- compiling with the newest libevent/glibc improved
+  things, but did remove problems.
+ environment:
+- server 8 GB RAM, dedicated for mysql+memcached
+- memcached configured for 2 GB
+- mysqld runnig, showing ~2000 queries/second/avg/24h
+- mysql needs about 2-3 GB RAM.
+- we're caching ojects up to one week.
+ so normally one woud expect: 8 GB RAM -3 GB mysql -2 GB = 3 GB
+should be sufficient for the OS doing nothing else (despite
+running an amanda backup client during the bakcup in the night).
+ the above machine startet to swap out (only some MB, it was
+less than 40MB, quite nothing, as the linux does using
+vm.swappiness=60 swap out normal OS prcoessess, too).
+ And if there is one rarely used page of the memcache
+swapped out, and an item from that page is requested, when
+at the same time one mysql query creates some io, then
+the corresponding memcache-page will be swapped in AFTER
+the mysql process finishes (deadline io scheduler).
+and that could be too late for the one second timeout.
+ I never had expected a machine to start swapping if
+free tells me that there are some GB free for caches.
+ I never ever would have thought of 40M in swap when
+3+ GB are caches/free  would cause such a problem.
+ conclusion:
+if you use memcache and need high amounts of memory with
+many objects, keep a look at your swap, and if there is
+something in it (even 1 kb) - it might be too much.
+after setting vm.swappiness to zero and paging in all swap,
+the effects were gone.
+ It explains also that we encountered the problem only
+on this machine whereas on about 40 other servers we
+did not - this machine was the oldest hardware,
+the slowest disks (even if raid10 on 4 disks) and the
+least memory (oure newer mysql/memcache servers
+have 16..32GB RAM), so they did not start to swap out
+even with vm.swappiness=60 ...
+ regards.
+ Werner.Reply allReply to authorForward0 new messagesSearchClear searchClose searchGoogle appsMain menu

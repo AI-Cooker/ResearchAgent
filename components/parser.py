@@ -12,7 +12,7 @@ def parse_page(url, output):
 
     # Returns a requests.models.Response object
     page = requests.get(
-        url, headers=headers, verify="D:\\Storages\\certs\\tma-ADCA-CA.crt"
+        url, headers=headers, verify=""
     )
 
     soup = BeautifulSoup(page.text, "html.parser")
