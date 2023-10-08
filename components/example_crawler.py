@@ -1,10 +1,11 @@
 from bs4 import BeautifulSoup
 import requests, json, lxml
 from parser import parse_page
+import pandas as pd
 
 # https://docs.python-requests.org/en/master/user/quickstart/#passing-parameters-in-urls
 params = {
-    "q": "memcached timed out",  # query example
+    "q": "What is retrieval augmented generation?",  # query example
     "hl": "en",  # language
     # "gl": "uk",  # country of the search, UK -> United Kingdom
     "start": 0,  # number page by default up to 0
@@ -29,7 +30,7 @@ while True:
         params=params,
         headers=headers,
         timeout=30,
-        verify="",
+        verify=False,
     )
     soup = BeautifulSoup(html.text, "lxml")
     # with open("search_page.html", "w", encoding="utf-8") as f:
@@ -43,7 +44,7 @@ while True:
             snippet = None
         links = result.select_one(".yuRUbf a")["href"]
 
-        data.append({"title": title, "snippet": snippet, "links": links})
+        data.append({"title": title, "snippet": snippet, "link": links})
 
     if soup.select_one(".d6cvqb a[id=pnnext]"):
         params["start"] += 10
@@ -51,8 +52,27 @@ while True:
     #     break
     if page_num == 5:
         break
+    
+    
+document_name = "rag"
+documents = []
+titles = []
+links = []
+snippets = []
+org_links = [d["link"] for d in data]
+print(f"Number of documents: {len(org_links)}")
 
-for idx, d in enumerate(data):
-    parse_page(d["links"], f"document_{idx}.txt")
+for idx, link in enumerate(org_links):
+    print(f"Parsing document {idx}: {link}")
+    try:
+        new_document = parse_page(link)
+        documents.append(new_document)
+        links.append(link)
+        titles.append(data[idx]["title"])
+        snippets.append(data[idx]["snippet"])
+    except:
+        pass
+print("Done!")
 
-print(json.dumps(data, indent=2, ensure_ascii=False))
+df_document = pd.DataFrame({"title": titles, "snippet": snippets, "links": links, "raw_document": documents})
+df_document.to_csv(f"components\\data\\documents\\{document_name}.csv")
