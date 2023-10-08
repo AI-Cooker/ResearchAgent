@@ -1,7 +1,0 @@
-Retrieval-augmented generation (RAG) is an AI framework for improving the quality of LLM-generated responses by grounding the model on external sources of knowledge to supplement the LLM's internal representation of information.
-
-RAG has two phases: retrieval and content generation. In the retrieval phase, algorithms search for and retrieve snippets of information relevant to the user's prompt or question. In the generative phase, the LLM draws from the augmented prompt and its internal representation of its training data to synthesize an engaging answer tailored to the user in that instant.
-
-RAG allows LLMs to build on a specialized body of knowledge to answer questions in more accurate way.
-
-IBM is currently using RAG to ground its internal customer-care chatbots on content that can be verified and trusted.

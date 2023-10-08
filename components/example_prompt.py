@@ -2,6 +2,7 @@ import pprint
 from google.generativeai.types.safety_types import HarmBlockThreshold
 from google.generativeai.types.safety_types import HarmCategory
 import google.generativeai as palm
+import pandas as pd
 
 palm.configure(api_key="AIzaSyBJKl57P-KrMx43TU4ojMtAO0qSoUWIjTs")
 
@@ -101,33 +102,29 @@ Now I give you the document:
 {}
 """
 
-file_format = "document_{}.txt"
+df_documents = pd.read_csv("components\\data\\documents\\rag.csv")
+clean_documents = []
 
-for i in range(45):
-    print(f"Processing file {i}")
-    file_name = file_format.format(i)
-    with open(
-        f"components\\data\\raw_documents\\retrieval_augmented_generation\\{file_name}",
-        "r",
-        encoding="utf-8",
-    ) as finput:
-        with open(
-            f"components\\data\\cleaned_documents\\retrieval_augmented_generation\\{file_name}",
-            "w",
-        ) as foutput:
-            final_prompt = clean_prompt.format(finput.read())
-            # print(final_prompt)
-            completion = palm.generate_text(
-                **defaults,
-                prompt=final_prompt,
-            )
-            # outputs = [output["output"] for output in completion.candidates]
-            # for output in outputs:
-            #     print(output)
-            #     print("-" * 50)
-            # print("-" * 50)
-            # print(completion.result)
-            if completion.result:
-                foutput.writelines(completion.result)
-            else:
-                print("Cannot summarize")
+for idx, doc in enumerate(df_documents["raw_document"].tolist()):
+    print(f"Processing file {idx}")
+    final_prompt = clean_prompt.format(doc)
+    # print(final_prompt)
+    completion = palm.generate_text(
+        **defaults,
+        prompt=final_prompt,
+    )
+    # outputs = [output["output"] for output in completion.candidates]
+    # for output in outputs:
+    #     print(output)
+    #     print("-" * 50)
+    # print("-" * 50)
+    # print(completion.result)
+    if completion.result:
+        clean_documents.append(completion.result)
+    else:
+        clean_documents.append("")
+        print("Cannot summarize")
+
+df_documents["clean_document"] = clean_documents
+
+df_documents.to_csv("components\\data\\documents\\rag.csv")

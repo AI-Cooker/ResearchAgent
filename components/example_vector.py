@@ -4,6 +4,7 @@ from langchain.vectorstores import Pinecone
 import os
 import pinecone
 import time
+import pandas as pd
 
 os.environ["REQUESTS_CA_BUNDLE"] = "D:\\Storages\\certs\\tma-ADCA-CA.crt"
 os.environ["CURL_CA_BUNDLE"] = "D:\\Storages\\certs\\tma-ADCA-CA.crt"
