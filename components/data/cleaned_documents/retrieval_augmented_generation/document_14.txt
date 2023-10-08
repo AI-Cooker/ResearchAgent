@@ -1,0 +1,5 @@
+Retrieval Augmented Generation (RAG) is a technique that combines retrieval-based and generative models to deliver accurate responses.
+
+RAG works by first finding the most relevant documents to a user's query. The information from these documents is then fed into a generative model to create the final response. This allows for citations, which allows the end user to verify the sources and delve deeper into the information provided.
+
+RAG can be used to build better AI chat experiences by reducing hallucinations in AI models and creating more accurate and evidence-based conversational experiences.

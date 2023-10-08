@@ -1,0 +1,23 @@
+Retrieval Augmented Generation (RAG) - Amazon SageMakerRetrieval Augmented Generation (RAG) - Amazon SageMakerAWSDocumentationAmazon SageMakerDeveloper GuideRetrieval Augmented Generation (RAG)Foundation models are usually trained offline, making the model agnostic to any
+                data that is created after the model was trained. Additionally, foundation models
+                are trained on very general domain corpora, making them less effective for
+                domain-specific tasks. You can use Retrieval Augmented Generation (RAG) to retrieve
+                data from outside a foundation model and augment your prompts by adding the relevant
+                retrieved data in context. For more information about RAG model architectures, see
+                    Retrieval-Augmented Generation for
+                    Knowledge-Intensive NLP Tasks.With RAG, the external data used to augment your prompts can come from multiple
+                data sources, such as a document repositories, databases, or APIs. The first step is
+                to convert your documents and any user queries into a compatible format to perform
+                relevancy search. To make the formats compatible, a document collection, or
+                knowledge library, and user-submitted queries are converted to numerical
+                representations using embedding language models. Embedding is the process by which text is given numerical
+                representation in a vector space. RAG model architectures compare the embeddings of
+                user queries within the vector of the knowledge library. The original user prompt is
+                then appended with relevant context from similar documents within the knowledge
+                library. This augmented prompt is then sent to the foundation model. You can update
+                knowledge libraries and their relevant embeddings asynchronously.
+For more information, see the following example notebooks: 
+Retrieval-Augmented Generation: Question Answering based on Custom
+                            Dataset
+Retrieval-Augmented Generation: Question Answering based on Custom
+                            Dataset with Open-sourced LangChain Library Javascript is disabled or is unavailable in your browser.To use the Amazon Web Services Documentation, Javascript must be enabled. Please refer to your browser's Help pages for instructions.Document ConventionsFine-tuningTask-Specific ModelsDid this page help you? - YesThanks for letting us know we're doing a good job!If you've got a moment, please tell us what we did right so we can do more of it.Did this page help you? - NoThanks for letting us know this page needs work. We're sorry we let you down.If you've got a moment, please tell us how we can make the documentation better.

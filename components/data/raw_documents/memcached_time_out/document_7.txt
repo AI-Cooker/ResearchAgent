@@ -1,0 +1,333 @@
+freebsd - How to debug memc/memcached timeouts with Nginx? - Server Fault
+Stack Exchange Network
+						Stack Exchange network consists of 183 Q&A communities including Stack Overflow, the largest, most trusted online community for developers to learn, share their knowledge, and build their careers.
+					
+Visit Stack Exchange
+Loading…
+                                Tour
+                                
+                                    Start here for a quick overview of the site
+                                
+                            Help Center
+                            
+                                Detailed answers to any questions you might have
+                            
+                                        Meta
+                                        
+                                            Discuss the workings and policies of this site
+                                        
+                                    About Us
+                                    
+                                        Learn more about Stack Overflow the company, and our products.
+                                    
+current community
+            Server Fault
+        
+help
+chat
+            Meta Server Fault
+        
+your communities            
+Sign up or log in to customize your list.                
+more stack exchange communities
+company blog
+Log in
+Sign up
+Server Fault is a question and answer site for system and network administrators. It only takes a minute to sign up.
+Sign up to join this community
+                    Anybody can ask a question
+                
+                    Anybody can answer
+                
+                    The best answers are voted up and rise to the top
+                
+                    Home
+                
+Public
+ Questions
+                    Tags
+                
+                    Users
+                
+                    Companies
+                
+                    Unanswered
+                
+Teams
+Stack Overflow for Teams
+        – Start collaborating and sharing organizational knowledge.
+        
+        
+Create a free Team
+Why Teams?
+Teams
+                    Create free Team
+                
+Teams
+Q&A for work
+Connect and share knowledge within a single location that is structured and easy to search.
+                    Learn more about Teams
+                
+How to debug memc/memcached timeouts with Nginx?
+        Ask Question
+    
+Asked
+12 years, 1 month ago
+Modified
+12 years, 1 month ago
+Viewed
+                        3k times
+                    
+            2
+        
+Problem
+Regular timeouts from the memcached backends in Nginx (see example errors below)
+Things already tested:
+it occurs both on local and remote memcached servers so the network can't be the problem
+it occurs both with the memc and memcached backends
+it occurs both with and without the upstream keepalive module
+it occurs in nginx 0.8, 1.0.x and 1.1.x
+buffering logs appear to slightly decrease the amount of errors, but they are still there and this could simply be coincidence
+logging through udp (i.e. non-blocking) to another makes no difference
+Other info:
+the memcached server handles ~500 requests per second from both this and other (remote) clients
+there are no errors/reports in the memcached logs
+memcached is started with the following settings:
+both tcp and udp are enabled (only tcp is used currently)
+16GB of memory
+16 threads (on a 32 core machine)
+limited to 8192 connections
+started in non-daemonic mode through supervisord
+The servers run FreeBSD 8.2
+The timeouts occur both during low and high loads (right now only about 50 request per second)
+The question
+So my question is... how can I debug these problems? Anyone has an idea where the underlying cause could be? The errors don't occur continuously but frequently enough to show up in the logs every couple of minutes.
+Example errors from the logs:
+2011/08/30 17:23:34 [error] 13921#0: *38602 upstream timed out (60: Operation timed out) while reading response header from upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:23:34 [error] 13921#0: *38591 upstream timed out (60: Operation timed out) while reading response header from u`enter code here`pstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:23:34 [error] 13921#0: *38601 upstream timed out (60: Operation timed out) while reading response header from upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:23:34 [error] 13921#0: *38918 upstream timed out (60: Operation timed out) while reading response header from upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:23:35 [error] 13921#0: *38595 upstream timed out (60: Operation timed out) while connecting to upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:24:32 [error] 13921#0: *41768 upstream timed out (60: Operation timed out) while connecting to upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:24:36 [error] 13921#0: *38599 upstream timed out (60: Operation timed out) while connecting to upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:25:12 [error] 13921#0: *42489 upstream timed out (60: Operation timed out) while connecting to upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:25:30 [error] 13922#0: *39444 upstream timed out (60: Operation timed out) while reading response header from upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+2011/08/30 17:25:30 [error] 13922#0: *39452 upstream timed out (60: Operation timed out) while reading response header from upstream, client: x.x.x.x, server: some.host.com, request: "GET /some_random_file HTTP/1.1", subrequest: "/memc_get", upstream: "memcached://127.0.0.1:11211", host: "some.host.com"
+Output from netstat -m
+# netstat -m
+3404/25531/28935 mbufs in use (current/cache/total)
+3318/25004/28322/229376 mbuf clusters in use (current/cache/total/max)
+1161/20599 mbuf+clusters out of packet secondary zone in use (current/cache)
+26/4420/4446/192000 4k (page size) jumbo clusters in use (current/cache/total/max)
+0/0/0/6400 9k jumbo clusters in use (current/cache/total/max)
+0/0/0/3200 16k jumbo clusters in use (current/cache/total/max)
+7591K/74070K/81661K bytes allocated to network (current/cache/total)
+0/0/0 requests for mbufs denied (mbufs/clusters/mbuf+clusters)
+0/0/0 requests for jumbo clusters denied (4k/9k/16k)
+0/0/0 sfbufs in use (current/peak/max)
+0 requests for sfbufs denied
+0 requests for sfbufs delayed
+4925075 requests for I/O initiated by sendfile
+0 calls to protocol drain routines
+nginxfreebsdtimeoutmemcached
+Share
+Improve this question
+                        Follow
+                    
+edited Sep 3, 2011 at 21:30
+Wolph
+        asked Aug 30, 2011 at 16:11
+WolphWolph
+86511 gold badge77 silver badges1212 bronze badges
+Add a comment
+ | 
+                                        1 Answer
+                                    1
+            Sorted by:
+        
+            Reset to default
+        
+                        Highest score (default)
+                    
+                        Date modified (newest first)
+                    
+                        Date created (oldest first)
+                    
+            1
+        
+From the error log output it looks as if NGiNX is waiting for network communication both in attempts to setup new connections and get data back from old connections.  You mentioned it happens both locally and remote so you say you ruled out networking.  However even the local one is still using a TCP socket to connect right?  Have you already checked that you aren't running out of mbufs on the BSD box:
+# netstat -m
+16387/4613/21000 mbufs in use (current/cache/total)
+16385/3957/20342/25600 mbuf clusters in use (current/cache/total/max)
+16384/2176 mbuf+clusters out of packet secondary zone in use (current/cache)
+0/403/403/12800 4k (page size) jumbo clusters in use (current/cache/total/max)
+0/0/0/6400 9k jumbo clusters in use (current/cache/total/max)
+0/0/0/3200 16k jumbo clusters in use (current/cache/total/max)
+36866K/10679K/47546K bytes allocated to network (current/cache/total)
+0/0/0 requests for mbufs denied (mbufs/clusters/mbuf+clusters)
+0/0/0 requests for jumbo clusters denied (4k/9k/16k)
+0/0/0 sfbufs in use (current/peak/max)
+0 requests for sfbufs denied
+0 requests for sfbufs delayed
+0 requests for I/O initiated by sendfile
+0 calls to protocol drain routines
+If you see mbufs are the issue you need to update your loader.conf and reboot(sadly not a runtime tunable), from /boot/loader.conf:
+kern.ipc.nmbclusters="128000"
+If you don't see anything there that indicates total==max then you should probably start by confirming that nginx isn't to blame.  I would probably do this by tcpduming the connection from nginx to memcached and verifying that nginx has indeed sent connection setups or requests when it claims its timing out waiting.  If that works out then I'd probably start running ktrace on the memcached process for a few minutes while an error occurs and look through the kdump to see if there are system calls failing (like send or accepts).
+Share
+Improve this answer
+                        Follow
+                    
+        answered Sep 3, 2011 at 17:02
+polynomialpolynomial
+4,0161414 silver badges2424 bronze badges
+2
+Thanks for your help, I have added the output of netstat -m but I don't see any immediate reason for the problem. I'll see if I can get some more info with tcpdump.
+– Wolph
+Sep 3, 2011 at 21:38
+tcpdump still shows connection setups/requests even when it's failing. But that's understandable since it's only a subset of the requests that's failing. The same goes for ktrace/truss, since most requests are successful it is hard to find the failing requests. Except some reconnects after a while (which are looking normal) I don't see anything useful in that output either
+– Wolph
+Sep 7, 2011 at 12:55
+Add a comment
+ | 
+                                    You must log in to answer this question.
+                                
+Not the answer you're looking for? Browse other questions tagged nginxfreebsdtimeoutmemcached.                                
+                            Featured on Meta
+                        
+ 
+What should be next for community events?
+ 
+Alpha test for short survey in banner ad slots starting on week of September...
+ 
+If more users could vote, would they engage more? Testing 1 reputation voting...
+Related
+5
+nginx+ uwsgi gives 502 Bad Gateway
+1
+How can we solve these errors for Nginx + PHP + FastCGI?
+0
+Mono fast cgi not working on nginx
+0
+Timeouts somewhere on our stack (haproxy, nginx, rails, memcached)
+0
+Nginx php-fpm pool being blocked and stop responding
+19
+nginx: connect() failed (111: Connection refused) while connecting to upstream
+1
+504 Gateway timeout / 502 Bad gateway after installing php curl - server nginx
+1
+502 error with nginx-ingress in Kubernetes to custom endpoint
+2
+why is nginx timeout-ing?
+            Hot Network Questions
+        
+                    High to Low poly Texture Baking
+                
+                    PhD Advisor Slander to Postdoc PI
+                
+                    Table stability
+                
+                    Conditional selection in a GROUP BY clause
+                
+                    How do I remove this folder from the Windows Explorer navigation bar?
+                
+                    Sci-fi soldiers with bulky armor brace their rifles on their chest plates. What do their rifle stocks look like?
+                
+                    Why does this Verilog code work without "wire" statements?
+                
+                    How can I improve insulation on a lower level floor without modification?
+                
+                    Is there are possible substitute for sugar in creamed butter?
+                
+                    Identification of shiny metallic blocks on the PCB
+                
+                    Would the USSR invade Poland in WW2 if the Germans did not cross into previously-agreed Soviet sphere of influence?
+                
+                    Remove space after math environment
+                
+                    What is a hypernym for artificial regions, like cities, states or unions?
+                
+                    Generate all lines from a file matching a given word list
+                
+                    A Trivial Pursuit #16 (Art and Literature 3/4): X
+                
+                    Election disruption caused by ballot typographic error or omission
+                
+                    is TLS compression used in modern browsers?
+                
+                    ImportError: cannot import name 'url_quote' from 'werkzeug.urls'
+                
+                    Why do relational comparison operators never short-circuit?
+                
+                    How to know if the model is underfitting because the data is hard to model, or just the model is too simplistic?
+                
+                    What distinguishes the people who get academic jobs from the people who don't?
+                
+                    Modifying ceiling fan switch for independent fan/light control -- Is it acceptable to run 14/3 alongside existing 14/2?
+                
+                    Print 100 digits of π
+                
+                    Earth enslaved by aliens. Last sentence of the short story gives added grimness to it
+                
+            more hot questions
+        
+            Question feed
+        
+                Subscribe to RSS
+            
+                        Question feed
+                        To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+Server Fault
+Tour
+Help
+Chat
+Contact
+Feedback
+Company
+Stack Overflow
+Teams
+Advertising
+Collectives
+Talent
+About
+Press
+Legal
+Privacy Policy
+Terms of Service
+Cookie Settings
+Cookie Policy
+Stack Exchange Network
+                                    Technology
+                                
+                                    Culture & recreation
+                                
+                                    Life & arts
+                                
+                                    Science
+                                
+                                    Professional
+                                
+                                    Business
+                                
+                                    API
+                                
+                                    Data
+                                
+Blog
+Facebook
+Twitter
+LinkedIn
+Instagram
+Site design / logo © 2023 Stack Exchange Inc; user contributions licensed under CC BY-SA.                    rev 2023.10.3.43658
+                        Your privacy
+                    
+                        By clicking “Accept all cookies”, you agree Stack Exchange can store cookies on your device and disclose information in accordance with our Cookie Policy.
+                    
+                            Accept all cookies
+                        
+                            Necessary cookies only
+                        
+                            Customize settings
+                        
+ 

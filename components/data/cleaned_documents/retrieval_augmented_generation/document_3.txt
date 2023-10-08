@@ -1,0 +1,25 @@
+Retrieval-augmented generation (RAG) is a relatively new artificial intelligence technique that can improve the quality of generative AI by allowing large language model (LLMs) to tap additional data resources without retraining.
+
+RAG models build knowledge repositories based on the organization's own data, and the repositories can be continually updated to help the generative AI provide timely, contextual answers.
+
+Chatbots and other conversational systems that use natural language processing can benefit greatly from RAG and generative AI.
+
+Implementing RAG requires technologies such as vector databases, which allow for the rapid coding of new data, and searches against that data to feed into the LLM.
+
+RAG is a relatively new technology, first proposed in 2020, AI developers are still learning how to best implement its information retrieval mechanisms in generative AI. Some key challenges are
+
+Improving organizational knowledge and understanding of RAG because it's so new
+Increasing costs; while generative AI with RAG will be more expensive to implement than an LLM on its own, this route is less costly than frequently retraining the LLM itself
+Determining how to best model the structured and unstructured data within the knowledge library and vector database
+Developing requirements for a process to incrementally feed data into the RAG system
+Putting processes in place to handle reports of inaccuracies and to correct or delete those information sources in the RAG system
+
+There are many possible examples of generative AI augmented by RAG.
+
+Cohere, a leader in the field of generative AI and RAG, has written about a chatbot that can provide contextual information about a vacation rental in the Canary Islands, including fact-based answers about beach accessibility, lifeguards on nearby beaches, and the availability of volleyball courts within walking distance.
+
+Oracle has described other use cases for RAG, such as analyzing financial reports, assisting with gas and oil discovery, reviewing transcripts from call center customer exchanges, and searching medical databases for relevant research papers.
+
+In the future, possible directions for RAG technology would be to help generative AI take an appropriate action based on contextual information and user prompts. For example, a RAG-augmented AI system might identify the highest-rated beach vacation rental on the Canary Islands and then initiate booking a two-bedroom cabin within walking distance of the beach during a volleyball tournament.
+
+RAG might also be able to assist with more sophisticated lines of questioning. Today, generative AI might be able to tell an employee about the company's tuition reimbursement policy; RAG could add more contextual data to tell the employee which nearby schools have courses that fit into that policy and perhaps recommend programs that are suited to the employee's jobs and previous training—maybe even help apply for those programs and initiate a reimbursement request.

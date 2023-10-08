@@ -1,0 +1,5 @@
+Retrieval Augmented Generation (RAG) is a technique that helps Large Language Models (LLMs) produce more accurate and relevant responses by providing them with additional context from a database of proprietary data. This context can include information about the world, such as current events or product specifications, or it can be specific to your company, such as customer records or product descriptions.
+
+RAG is the most cost-effective, easy to implement, and lowest-risk path to improving the performance of your GenAI applications. It is also the only approach that addresses both the recency and domain-specific data issues that plague LLMs.
+
+To learn more about RAG and how it can help you improve the performance of your GenAI applications, visit the Pinecone website.
