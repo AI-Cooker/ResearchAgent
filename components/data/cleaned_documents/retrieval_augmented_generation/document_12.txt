@@ -1,0 +1,15 @@
+Retrieval-augmented generation (RAG) is a relatively new artificial intelligence technique that can improve the quality of generative AI by allowing large language model (LLMs) to tap additional data resources without retraining.
+
+RAG models build knowledge repositories based on the organization's own data, and the repositories can be continually updated to help the generative AI provide timely, contextual answers.
+
+Chatbots and other conversational systems that use natural language processing can benefit greatly from RAG and generative AI.
+
+Implementing RAG requires technologies such as vector databases, which allow for the rapid coding of new data, and searches against that data to feed into the LLM.
+
+RAG is a relatively new technology, first proposed in 2020, AI developers are still learning how to best implement its information retrieval mechanisms in generative AI. Some key challenges are
+
+Improving organizational knowledge and understanding of RAG because it's so new
+Increasing costs; while generative AI with RAG will be more expensive to implement than an LLM on its own, this route is less costly than frequently retraining the LLM itself
+Determining how to best model the structured and unstructured data within the knowledge library and vector database
+Developing requirements for a process to incrementally feed data into the RAG system
+Putting processes in place to handle reports of inaccuracies and to correct or delete those information sources in the RAG system
