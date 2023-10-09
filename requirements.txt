@@ -1,2 +1,5 @@
 google-generativeai==0.2.1
 pandas
+bs4
+lxml
+pymongo

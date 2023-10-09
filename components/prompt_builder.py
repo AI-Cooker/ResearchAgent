@@ -187,6 +187,7 @@ def prompt(input: str, type: str, **kwargs):
         titles = kwargs['titles']
         links = kwargs['links']
         document_data = ""
+        final_prompt = analyze_prompt.format(document_data=document_data, input_message=input)
         for idx in range(len(titles)):
             document_data += """
             Document {idx}: {title}
@@ -195,7 +196,6 @@ def prompt(input: str, type: str, **kwargs):
             """.format(idx=idx+1, title=titles[idx], link=links[idx], content=document_content[idx])
             if palm.count_message_tokens(prompt=final_prompt)["token_count"] > 8192 - 500:
                 break
-        final_prompt = analyze_prompt.format(document_data=document_data, input_message=input)
         print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
         completion = palm.generate_text(
             **defaults,
