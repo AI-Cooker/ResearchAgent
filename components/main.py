@@ -6,25 +6,20 @@ import time
 start = time.time()
 
 
-input_string = "should I use capped collection or cluster-index collection in mongodb for storing user data?"
-# 'cluster-index collection vs capped collection in mongodb',
-# 'when to use capped collection vs cluster-index collection in mongodb',
-# 'pros and cons of capped collection vs cluster-index collection in mongodb',
-# 'which is better capped collection or cluster-index collection in mongodb for storing user data',
-# 'which one should I use capped collection or cluster-index collection in mongodb for storing user data'
-
+input_string = "What is agile in software development?"
 
 response = prompt(input=input_string, type="search")
 
 df_document = None
-for search_string in response:
+for search_string in response[:1]: #For quick testing, just process the first search string 
     print(f"Crawling document for {search_string}")
-    df_document = crawl(search_string=search_string, df_document=df_document)
+    df_document = crawl(search_string=search_string, df_document=df_document, max_doc=5)
 
 clean_documents = []
 for idx, raw_document in enumerate(df_document["raw_document"].tolist()):
     print(f"Cleaning document {idx}")
     clean_document = prompt(input=raw_document, type="clean")
+    print(f"CLEANED DOCUMENT: {clean_document}")
     if clean_document:
         clean_documents.append(clean_document)
     else:
@@ -35,9 +30,21 @@ for idx, raw_document in enumerate(df_document["raw_document"].tolist()):
 df_document["clean_document"] = clean_documents
 print(df_document.head())
 
-db = get_db()
-for index, row in df_document.iterrows():
-    db["documents"].insert_one({"prompt": input_string, "title": row["title"], "link": row["link"], "raw_document": row["raw_document"], "clean_document": row["clean_document"]})
+analyze_kwargs = {
+    "documents": df_document["clean_document"].tolist(),
+    "links": df_document["link"].tolist(),
+    "titles": df_document["title"].tolist()
+}
+
+result = prompt(input_string, type="analyze", **analyze_kwargs)
+
+print(result)
+
+# db = get_db()
+# for index, row in df_document.iterrows():
+#     db["documents"].insert_one({"prompt": input_string, "title": row["title"], "link": row["link"], "raw_document": row["raw_document"], "clean_document": row["clean_document"]})
+
+
 
 print(f"Time: {time.time() - start}")
 

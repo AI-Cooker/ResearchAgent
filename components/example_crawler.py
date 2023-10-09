@@ -3,7 +3,7 @@ import requests, json, lxml
 from parser import parse_page
 import pandas as pd
 
-def crawl(search_string, df_document=None):
+def crawl(search_string, df_document=None, max_doc=50):
     # https://docs.python-requests.org/en/master/user/quickstart/#passing-parameters-in-urls
     params = {
         "q": search_string,  # query example
@@ -74,14 +74,15 @@ def crawl(search_string, df_document=None):
             links.append(link)
             titles.append(data[idx]["title"])
             snippets.append(data[idx]["snippet"])
+            if len(links) == max_doc:
+                break
         except:
             pass
     print("Done!")
-    if df_document is not None:
-        for title, link, document in zip(titles, links, documents):
-            if link not in df_document["link"].tolist():
-                df_document = pd.concat([df_document, pd.DataFrame([{"title": title, "link": link, "raw_document": document}])], ignore_index=True)
-    else:
-        df_document = pd.DataFrame({"title": titles, "link": links, "raw_document": documents})
+    if df_document is None:
+        df_document = pd.DataFrame({"title": [], "link": [], "raw_document": []})
+    for title, link, document in zip(titles, links, documents):
+        if link not in df_document["link"].tolist():
+            df_document = pd.concat([df_document, pd.DataFrame([{"title": title, "link": link, "raw_document": document}])], ignore_index=True)
     return df_document
 # df_document.to_csv(f"components\\data\\documents\\{document_name}.csv")

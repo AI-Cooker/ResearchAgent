@@ -1,7 +1,2 @@
-sentence_transformers
 google-generativeai==0.2.1
-pinecone-client
-langchain
-python-dotenv
-dotenv
-pytorch
+pandas
