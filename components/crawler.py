@@ -42,6 +42,10 @@ def get_soup_objects(text_search, num_of_page):
     data_crawler = {text_search: data}
     return data_crawler
 
+search_string = ["medium", "vnexpress", "Bây giờ là mấy giờ"]
+res = {}
+for usr_input in search_string:
+    res.update(get_soup_objects(usr_input, 5))
 
-x = get_soup_objects("ahihi", 5)
-print(x)
+print(len(res)) # 3
+print(len(res['medium'])) # 5
