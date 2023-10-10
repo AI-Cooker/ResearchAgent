@@ -1,12 +1,13 @@
 from prompt_builder import prompt
 from example_crawler import crawl
 from db import get_db, find_by_id
+from example_chroma import add_collections, query_collections
 import time
 
 start = time.time()
 
 
-input_string = "What is agile in software development?"
+input_string = "What is lambda architecture?"
 
 response = prompt(input=input_string, type="search")
 
@@ -30,11 +31,21 @@ for idx, raw_document in enumerate(df_document["raw_document"].tolist()):
 df_document["clean_document"] = clean_documents
 print(df_document.head())
 
-analyze_kwargs = {
+dataset = {
     "documents": df_document["clean_document"].tolist(),
     "links": df_document["link"].tolist(),
     "titles": df_document["title"].tolist()
 }
+
+# Chromadb
+add_collections(dataset)
+chromadb_query = query_collections(input_string, n_result=10)
+analyze_kwargs = {
+    "documents": chromadb_query["documents"][0],
+    "links": chromadb_query["ids"][0],
+    "titles": [item["title"] for item in chromadb_query["metadatas"][0]],
+}
+
 
 result = prompt(input_string, type="analyze", **analyze_kwargs)
 
