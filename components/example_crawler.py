@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup
 import requests, json, lxml
 from parser import parse_page
+from prompt_builder import prompt
 import pandas as pd
 
-def crawl(search_string, df_document=None, max_doc=50):
+def crawl(search_string, df_document=None, max_page=3):
     # https://docs.python-requests.org/en/master/user/quickstart/#passing-parameters-in-urls
     params = {
         "q": search_string,  # query example
@@ -54,35 +55,6 @@ def crawl(search_string, df_document=None, max_doc=50):
             pass
         # else:
         #     break
-        if page_num == 1:
+        if page_num == max_page:
             break
-        
-        
-    # document_name = "rag"
-    documents = []
-    titles = []
-    links = []
-    snippets = []
-    org_links = [d["link"] for d in data]
-    print(f"Number of documents: {len(org_links)}")
-
-    for idx, link in enumerate(org_links):
-        print(f"Parsing document {idx}: {link}")
-        try:
-            new_document = parse_page(link)
-            documents.append(new_document)
-            links.append(link)
-            titles.append(data[idx]["title"])
-            snippets.append(data[idx]["snippet"])
-            if len(links) == max_doc:
-                break
-        except:
-            pass
-    print("Done!")
-    if df_document is None:
-        df_document = pd.DataFrame({"title": [], "link": [], "raw_document": []})
-    for title, link, document in zip(titles, links, documents):
-        if link not in df_document["link"].tolist():
-            df_document = pd.concat([df_document, pd.DataFrame([{"title": title, "link": link, "raw_document": document}])], ignore_index=True)
-    return df_document
-# df_document.to_csv(f"components\\data\\documents\\{document_name}.csv")
+    return data
