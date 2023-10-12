@@ -76,7 +76,7 @@ defaults = {
     # "top_k": 3000,
     # "top_p": 0.95,
     # "stop_sequences": [],
-    "max_output_tokens": 8192,
+    "max_output_tokens": 4096,
     "safety_settings": [
         {
             "category": HarmCategory.HARM_CATEGORY_DEROGATORY,
@@ -117,7 +117,8 @@ def prompt(input: str, type: str, **kwargs):
             print(completion.result)
             return ast.literal_eval(completion.result)
         else:
-            return "Sorry I cannot process your input"
+            print(f"{type.upper()} Sorry I cannot process your input: {completion}")
+            return None
     if type == "search":
         final_prompt = search_string_prompt.format(input)
         print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
@@ -129,7 +130,8 @@ def prompt(input: str, type: str, **kwargs):
             print(completion.result)
             return ast.literal_eval(completion.result)
         else:
-            return "Sorry I cannot process your input"
+            print(f"{type.upper()} Sorry I cannot process your input: {completion}")
+            return None
     elif type == "query":
         final_prompt = query_string_prompt.format(input)
         completion = palm.generate_text(
@@ -139,10 +141,12 @@ def prompt(input: str, type: str, **kwargs):
         if completion.result:
             print(completion.result)
         else:
-            print("Sorry I cannot process your input")
+            print(f"{type.upper()} Sorry I cannot process your input: {completion}")
+            return None
     elif type == "clean":
         try:
             document = kwargs['document']
+            print(f"Number of words: {len(document.split(' '))}")
             input_token_count = palm.count_message_tokens(prompt=f"{document} {input}")["token_count"]
             print(f"Number of tokens: {input_token_count}")
             if input_token_count > 8192 - 500:
@@ -200,10 +204,10 @@ def prompt(input: str, type: str, **kwargs):
                 if completion.result:
                     return completion.result
                 else:
-                    print("Sorry I cannot process your input")
+                    print(f"{type.upper()} Sorry I cannot process your input: {completion}")
                     return None
         except Exception as exc:
-            print(f"Sorry I cannot process your input. Error: {exc}")
+            print(f"{type.upper()} An error happened during prompting: {exc}")
             return None
     elif type == "analyze":
         try:
@@ -228,10 +232,10 @@ def prompt(input: str, type: str, **kwargs):
             if completion.result:
                 return completion.result
             else:
-                print("Sorry I cannot process your input")
+                print(f"{type.upper()} Sorry I cannot process your input: {completion}")
                 return None
-        except:
-            print("Sorry I cannot process your input")
+        except Exception as exc:
+            print(f"{type.upper()} An error happened during prompting: {exc}")
             return None
         
         

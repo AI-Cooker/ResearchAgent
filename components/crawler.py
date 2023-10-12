@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from googlesearch import search   
+from googlesearch import search  
+import re 
 
 def get_urls(text_search, num_of_page=10):
     # to search 
@@ -22,6 +23,21 @@ def crawler(url):
     return soup, title
 
 
+def get_soup_object(url):
+    row = {}
+    try:
+        soup, title = crawler(url)
+        row['title'] = title
+        row['document'] = re.sub(r"\n\s*\n", "\n", soup.get_text(), flags=re.MULTILINE)
+    except Exception as e:
+        row['title'] = None
+        row['document'] = None
+        print('Request error:', e)
+    finally:
+        row['url'] = url
+    return row
+
+
 def get_soup_objects(text_search, num_of_page):
     data = []
     urls = get_urls(text_search, num_of_page)
@@ -31,7 +47,7 @@ def get_soup_objects(text_search, num_of_page):
         try:
             soup, title = crawler(current_url)
             row['title'] = title
-            row['soup'] = soup
+            row['soup'] = re.sub(r"\n\s*\n", "\n", soup.get_text(), flags=re.MULTILINE)
         except Exception as e:
             row['title'] = None
             row['soup'] = None
@@ -41,11 +57,3 @@ def get_soup_objects(text_search, num_of_page):
             data.append(row)
     data_crawler = {text_search: data}
     return data_crawler
-
-search_string = ["medium", "vnexpress", "Bây giờ là mấy giờ"]
-res = {}
-for usr_input in search_string:
-    res.update(get_soup_objects(usr_input, 5))
-
-print(len(res)) # 3
-print(len(res['medium'])) # 5
