@@ -5,6 +5,7 @@ const footerStyle = {
   textAlign: 'center',
   color: '#fff',
   backgroundColor: '#7dbcea',
+  height: '5%',
 };
 
 const Footer = (props) => {

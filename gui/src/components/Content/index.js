@@ -1,16 +1,13 @@
 import { RightOutlined, LeftOutlined } from '@ant-design/icons';
 import { Layout } from 'antd';
 import SideBar from '../SideBar';
+import ChatBox from '../ChatBox';
 import { useState } from 'react';
+import styles from './Content.module.scss';
+import classNames from 'classnames/bind';
 
 const { Content: ContentAntd } = Layout;
-const contentStyle = {
-  textAlign: 'center',
-  minHeight: 120,
-  lineHeight: '120px',
-  color: '#fff',
-  backgroundColor: '#108ee9',
-};
+const cx = classNames.bind(styles);
 
 const Content = (props) => {
   const [isShowSideBar, setIsShowSideBar] = useState(true);
@@ -21,14 +18,16 @@ const Content = (props) => {
   };
 
   return (
-    <Layout hasSider>
+    <Layout hasSider className={cx("Content-wrapper")}>
       {isShowSideBar ? <SideBar /> : null}
       {isShowSideBar ? (
         <LeftOutlined style={{ cursor: 'pointer', backgroundColor: '#3ba0e9' }} onClick={handleShowSidebar} />
       ) : (
         <RightOutlined style={{ cursor: 'pointer', backgroundColor: '#3ba0e9' }} onClick={handleShowSidebar} />
       )}
-      <ContentAntd style={contentStyle}>Content</ContentAntd>
+      <ContentAntd>
+        <ChatBox />
+      </ContentAntd>
     </Layout>
   );
 };

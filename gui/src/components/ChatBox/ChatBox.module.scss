@@ -1,0 +1,36 @@
+@import '../GlobalStyles/GlobalStyles.scss';
+
+.Chatbox-wrapper {
+  height: 100%;
+  background-color: $dark-mode-background-color;
+  color: $dark-mode-color;
+}
+
+.Chatbox-wrapper .Chatbox-input-wrapper {
+  height: 7%;
+  display: flex;
+  border-radius: 5px;
+  align-items: center;
+  border: 1px solid #478a8a;
+}
+
+.Chatbox-wrapper .Chatbox-textarea {
+  resize: none;
+  background-color: $dark-mode-background-color;
+  border: none;
+  color: $dark-mode-color;
+}
+
+.Chatbox-wrapper .Chatbox-send-button {
+  height: 100%;
+  padding: 7px;
+  cursor: pointer;
+  font-size: 20px;
+  border-left: 1px solid #478a8a;
+}
+
+.Chatbox-wrapper .MessageBox-wrapper {
+  height: 93%;
+  overflow-y: scroll;
+  padding: 5px;
+}
