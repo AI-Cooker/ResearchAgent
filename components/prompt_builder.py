@@ -4,34 +4,23 @@ from google.generativeai.types.safety_types import HarmCategory
 import google.generativeai as palm
 import pandas as pd
 import ast
+from tenacity import retry, stop_after_attempt
 
 palm.configure(api_key="AIzaSyBJKl57P-KrMx43TU4ojMtAO0qSoUWIjTs")
 
-parse_input_prompt = """
-You are an assistant that parses the user input into a chain of thought.
-If the user input was straight forward, you don't need to do anything.
-Otherwise, you need to think about what information you would need to resolve the user input step by step.
-The response will follow as the format: ["step 1", "step 2", "step 3", ].
-Take a look at some examples:
-- user input: When we need to use agile in software development?
-- response: ["When we need to use agile in software development?"]
-- user input: What are the currently best frameworks for web development, provide a comparison between them in term of difficulty in learning them.
-- response: ["What are the currently best frameworks for web development", "Compare the difficulty in learning these web frameworks"]
-Here is the user input: {}
-"""
+# parse_input_prompt = """You are an assistant that provides step by step for user to solve the problem in the user input.
+# You need to figure out what the the main goal in the user input. Depend on the context in the user input, you need to provide step by step of the actions that user need to research for information on google.
+# The response will follow as the format: ["what information need for action 1", "what information need for action 2"].
+# Now I give you ther user input: '{}'"""
 
-search_string_prompt = """
-You are an assistant that generates the search strings based on user input. The search strings are used for performing google search to find the information about the user input. You should think about all the possible questions that related to the user input which are related to risk, difficulties, pros and cons,... The maximum number of search strings generated should be 5.
-The type of search strings shoud be relied on the type of the user input.
-You shouldn't provide dupplicate search strings with the same meaning, think about unique ones.
-You need to provide output as the following format: ['string 1', 'string 2', ].
-Here are some examples:
-- user input: "error: object reference not set to an instance of an object"
-- response: ['What are the causes of the "error: object reference not set to an instance of an object?"', 'How to fix "object reference not set to an instance of an object?"']
-- user input: "How to implement a RAG system?"
-- response: ['what is a RAG system?', 'How to implement RAG system step by step?', 'What are the technoligies used for a RAG system?', 'What are the specials of a RAG system?', 'What are pros and cons of a RAG system?']
-Now help me generate search strings for this: "{}"
-"""
+parse_input_prompt = ("You are an assistant that helps user analyze the problems in user input. "
+                      + "When the user input is a complex problem, "
+                      + "you need to break it down into separate questions, focus on the special requirements from the user input if have. "
+                      + "The questions provided should contain the information from the user input. "
+                      + "The response will follow the format: ['first question', 'second question']. "
+                      + "Here is the user input: '{}'")
+                    #   + "Here are some examples: - user input: 'I have a large amount of queries on a single table with millions of record'")
+
 
 query_string_prompt = """
 You are an assistant that generates natural language queries for a Information Retrieval system based on user input. The queries should give information that related to the user input. The maximum number of search strings generated should be 5.
@@ -40,41 +29,37 @@ If the user input is a complex problem, you should break it down into easier par
 Now help me generate queries for this: "{}"
 """
 
-clean_prompt = """
-You are an assistant that help user summarize a raw document that may contains some nonsense words/characters. Please summarize as much detailed as possible.
-When summarizing the document, you need to keep the information that related to this {input_message}
-Now I give you the document:
-{document}
-"""
 
-synthesis_prompt = """
-You are an assistant that help user synthesize the final document from given document parts. The as detailed as possible.
-If there are dupplicates information between parts, you just keep one.
-If there are nonsense lines that seems not related to the final document, you must remove it.
-Now I give you all the document parts:
-{}
+# clean_prompt = """
+# You are an assistant that help user clean a raw document that may contains some nonsense words/characters. Please summarize as much detailed as possible.
+# When cleaning the document, you need to keep the information that related to this '{input_message}'.
+# Now I give you the document:
+# {document}
+# """
+
+clean_prompt = """
+Summarize this document: 
+{document} 
+Focus on the information that related to '{input_message}'.
 """
 
 
 analyze_prompt = """
-You are an assistant that resolves user input with the information in the given documents.
-First, you need to read the information in the given documents carefully.
-Then, you need to think what user would need in the response with the user input. If the user input is a complex problem, you should break it down into easier problems, and resolve one by one.
-The response will be one from two cases:
-1. If there is not enough information for resolving the user input, you must response "[INSUFFICIENT]" and the reason.
-2. If there is enough information, you must provide the response from the given documents that might be the solution, and you need to provide the document Link to the information used.
-Do not use any information outside the given documents.
-Here are the documents:
+You are an assistant that resolves the question with the information in the given documents.
+You need to analyze the information carefully for the question, then response in one of two option below:
+1. If the given information is not enough to resolve the question, please response [INSUFFICIENT] and the reason. 
+2. If the given information is enough, you must provide the detailed answer and all the reference document links.
+Here is the information:
 {document_data}
-And here is the user input: "{input_message}"
+And here is the question: "{input_message}"
 """
 
 defaults = {
     "model": "models/text-bison-001",
-    # "temperature": 0.1,
+    "temperature": 0.1,
     # "candidate_count": 1,
-    # "top_k": 3000,
-    # "top_p": 0.95,
+    "top_k": 50,
+    "top_p": 0.1,
     # "stop_sequences": [],
     "max_output_tokens": 4096,
     "safety_settings": [
@@ -105,26 +90,14 @@ defaults = {
     ],
 }
 
+@retry(stop=stop_after_attempt(3))
 def prompt(input: str, type: str, **kwargs):
     if type == "parse":
         final_prompt = parse_input_prompt.format(input)
         print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
         completion = palm.generate_text(
             **defaults,
-            prompt=final_prompt,
-        )
-        if completion.result:
-            print(completion.result)
-            return ast.literal_eval(completion.result)
-        else:
-            print(f"{type.upper()} Sorry I cannot process your input: {completion}")
-            return None
-    if type == "search":
-        final_prompt = search_string_prompt.format(input)
-        print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
-        completion = palm.generate_text(
-            **defaults,
-            prompt=final_prompt,
+            prompt=final_prompt
         )
         if completion.result:
             print(completion.result)
@@ -149,7 +122,7 @@ def prompt(input: str, type: str, **kwargs):
             print(f"Number of words: {len(document.split(' '))}")
             input_token_count = palm.count_message_tokens(prompt=f"{document} {input}")["token_count"]
             print(f"Number of tokens: {input_token_count}")
-            if input_token_count > 8192 - 500:
+            if input_token_count > 8192 - 500 or input_token_count < 500:
                 return None
                 # Handle case when the document is too long
                 # document_parts = []
@@ -210,33 +183,38 @@ def prompt(input: str, type: str, **kwargs):
             print(f"{type.upper()} An error happened during prompting: {exc}")
             return None
     elif type == "analyze":
-        try:
-            document_content = kwargs['documents']
-            titles = kwargs['titles']
-            links = kwargs['links']
-            document_data = ""
+        # try:
+        data = kwargs['data']
+        problems = kwargs['problems']
+        document_data = ""
+        for idx, problem in enumerate(problems):
+            document_data += f"{idx}. {problem}\n"
+            documents = data[problem]["documents"]
+            titles = data[problem]["titles"]
+            links = data[problem]["links"]
             for idx in range(len(titles)):
                 document_data += """
-                Document {idx}: {title}
-                Link: {link}
+                Document {idx}: Title: {title} - Link: {link}
                 Content: {content}
-                """.format(idx=idx+1, title=titles[idx], link=links[idx], content=document_content[idx])
+                """.format(idx=idx+1, title=titles[idx], link=links[idx], content=documents[idx])
                 if palm.count_message_tokens(prompt=document_data)["token_count"] > 8192 - 500:
                     break
-            final_prompt = analyze_prompt.format(document_data=document_data, input_message=input)
-            print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
-            completion = palm.generate_text(
-                **defaults,
-                prompt=final_prompt,
-            )
-            if completion.result:
-                return completion.result
-            else:
-                print(f"{type.upper()} Sorry I cannot process your input: {completion}")
-                return None
-        except Exception as exc:
-            print(f"{type.upper()} An error happened during prompting: {exc}")
+            document_data += "\n"
+        final_prompt = analyze_prompt.format(document_data=document_data, input_message=input)
+        print(f"Number of tokens: {palm.count_message_tokens(prompt=final_prompt)}")
+        print(final_prompt)
+        completion = palm.generate_text(
+            **defaults,
+            prompt=final_prompt,
+        )
+        if completion.result:
+            return completion.result
+        else:
+            print(f"{type.upper()} Sorry I cannot process your input: {completion}")
             return None
+        # except Exception as exc:
+        #     print(f"{type.upper()} An error happened during prompting: {exc}")
+        #     return None
         
         
         

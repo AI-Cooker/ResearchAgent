@@ -17,7 +17,7 @@ def crawler(url):
               'Accept-Language': 'en-US,en;q=0.9',
               'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'}
     
-    data = requests.get(url, headers=headers)
+    data = requests.get(url, headers=headers, verify=False)
     soup = BeautifulSoup(data.content, "lxml")
     title = soup.title.text
     return soup, title
@@ -32,7 +32,7 @@ def get_soup_object(url):
     except Exception as e:
         row['title'] = None
         row['document'] = None
-        print('Request error:', e)
+        print('Cannot crawl the page content: ', e)
     finally:
         row['url'] = url
     return row
