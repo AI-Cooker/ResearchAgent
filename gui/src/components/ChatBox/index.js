@@ -23,7 +23,7 @@ const ChatBox = (props) => {
   const [messageInput, setMessageInput] = useState('');
   const [limitToken, setLimitToken] = useState(0);
   const bottomMessage = useRef(null);
-  const { messageData } = state;
+  const { messageData, currentSessionId } = state;
 
   useEffect(() => {
     sessionStorage.setItem('data', JSON.stringify(messageData));
@@ -82,7 +82,7 @@ const ChatBox = (props) => {
         <div ref={bottomMessage}></div>
       </div>
       <span className={cx('Chatbox-token-limit')}>
-        Limit Token: {limitToken}/{maxToken}
+        Limit Token: {limitToken}/{maxToken} Current Session: {currentSessionId}
       </span>
       <div className={cx('Chatbox-input-wrapper')}>
         <TextArea
