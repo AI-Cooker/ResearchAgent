@@ -1,0 +1,51 @@
+@import '../GlobalStyles/GlobalStyles.scss';
+
+.Message-divider-user {
+  // color: #0084ff !important;
+  border-color: white !important;
+}
+
+.Message-divider-bot {
+  // color: #3e4042 !important;
+  border-color: white !important;
+}
+
+.Message-name-user {
+  color: white;
+  background-color: #0084ff;
+  padding: 7px 14px;
+  border-radius: 18px;
+}
+
+.Message-name-bot {
+  color: white;
+  background-color: #3e4042;
+  padding: 7px 14px;
+  border-radius: 18px;
+}
+
+.Message-user-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.Message-bot-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.Message-user {
+  text-align: right;
+  background-color: #0084ff;
+  border-radius: 18px;
+  padding: 7px 14px;
+  width: max-content;
+}
+
+.Message-bot {
+  text-align: left;
+  background-color: #3e4042;
+  border-radius: 18px;
+  padding: 7px 14px;
+  width: max-content;
+}

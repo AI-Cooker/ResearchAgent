@@ -21,6 +21,10 @@
   color: $dark-mode-color;
 }
 
+.Chatbox-wrapper .Chatbox-textarea::placeholder {
+  color: white;
+}
+
 .Chatbox-wrapper .Chatbox-send-button {
   height: 100%;
   padding: 7px;
@@ -30,7 +34,12 @@
 }
 
 .Chatbox-wrapper .MessageBox-wrapper {
-  height: 93%;
+  height: 91%;
   overflow-y: scroll;
+  border: 1px solid #478a8a;
   padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 9px;
 }
