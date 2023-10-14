@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-SESSION_DB = ['f16566cea7c61ab0c953ce494684c016']
+SESSION_DB = []
 
 
 def get_session_id(request: Request):
