@@ -1,11 +1,11 @@
+import time
 from prompt_builder import prompt
 from crawler import get_urls, get_soup_object
-from parser import parse_page
-from db import get_db, find_by_id
-import time
-import pandas as pd
+from vector_chromadb import check_already_in_db, get_or_create_collection, update_or_insert_to_collection
 
-def main(input_string):
+
+def main(input_string, session_id):
+    collection = get_or_create_collection(session_id)
     problems = prompt(input_string, type="parse")
     problem_urls = {}
     data = {}
@@ -17,6 +17,13 @@ def main(input_string):
     for problem in problems:
         print("-"*25 + f"START PROCESSING PROBLEM" + "-"*25)
         print(problem)
+        # ----------------------------------------------------
+        result, distance = check_already_in_db(problem, collection)
+        if result and distance < 10:
+            print("Exist in chromadb")
+            data[problem] = {"documents": result["documents"], "links": result["links"], "titles": result["titles"]}
+            continue
+        # ----------------------------------------------------
         is_done = False
         for idx, url in enumerate(problem_urls[problem]):
             if is_done:
@@ -35,6 +42,7 @@ def main(input_string):
                 if clean_document:
                     print("-"*25 + "CLEANED DOCUMENT" + "-"*25)
                     data[problem] = {"documents": [clean_document], "links": [link], "titles": [title]}
+                    update_or_insert_to_collection(data[problem], collection)
                     is_done = True
     analyze_kwargs = {
         "data": data,
@@ -55,9 +63,11 @@ def main(input_string):
 # input_string = "I have a small application with few tables and the amount of rows is not much, what type of database I should use? What kinds of problems likely to happened?"
 input_string = "I have a small application with few tables and the amount of rows is not much, what type of database I should use? What kinds of problems likely to happened? Please provide the specific database."
 # input_string = "My application have millions of records that also have high write/read frequency, what type of NoSQL I should use? Recommend me some NoSQL Database for this. I storing document data that are rarely change the structure."
-        
+
+session_id = "this_is_session_id"
+
 start = time.time()
-res = main(input_string)
+res = main(input_string, session_id)
 # # res = prompt(input_string, type="parse")
 # print("-"*25 + f"RESULT in {round(time.time() - start)}s" + "-"*25)
 # print(res)
