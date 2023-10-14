@@ -1,0 +1,8 @@
+@import '../GlobalStyles/GlobalStyles.scss';
+
+.Sidebar-wrapper {
+  color: $dark-mode-color;
+  background-color: $dark-mode-background-color !important;
+  border-radius: 5px;
+  border: 1px solid #478a8a;
+}

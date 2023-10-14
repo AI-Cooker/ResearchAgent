@@ -4,6 +4,7 @@ import { Input } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import Message from '../Message';
 import { useEffect, useRef, useState } from 'react';
+import { useStore, actions } from '~/store';
 
 const { TextArea } = Input;
 const cx = classNames.bind(styles);
@@ -18,10 +19,11 @@ const ChatBox = (props) => {
   initSessionData();
 
   const maxToken = 2000;
+  const [state, dispatch] = useStore();
   const [messageInput, setMessageInput] = useState('');
-  const [messageData, setMessageData] = useState(JSON.parse(sessionStorage.getItem('data')));
-  const bottomMessage = useRef(null);
   const [limitToken, setLimitToken] = useState(0);
+  const bottomMessage = useRef(null);
+  const { messageData } = state;
 
   useEffect(() => {
     sessionStorage.setItem('data', JSON.stringify(messageData));
@@ -45,19 +47,21 @@ const ChatBox = (props) => {
       return;
     }
     setMessageInput('');
-    setMessageData(
-      messageData.concat([
-        {
-          position: 'right',
-          message: `${messageInput}`,
-          username: 'Username',
-        },
-        {
-          position: 'left',
-          message: `${messageInput}`,
-          username: 'Bot',
-        },
-      ]),
+    dispatch(
+      actions.setMessageData(
+        messageData.concat([
+          {
+            position: 'right',
+            message: `${messageInput}`,
+            username: 'Username',
+          },
+          {
+            position: 'left',
+            message: `${messageInput}`,
+            username: 'Bot',
+          },
+        ]),
+      ),
     );
   };
 

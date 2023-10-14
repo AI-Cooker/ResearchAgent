@@ -1,16 +1,24 @@
 import { Layout } from 'antd';
+import styles from './SideBar.module.scss';
+import classNames from 'classnames/bind';
+import { PlusOutlined } from '@ant-design/icons';
+import { useStore } from '~/store';
+import { actions } from '~/store';
 
 const { Sider } = Layout;
-
-const siderStyle = {
-  textAlign: 'center',
-  lineHeight: '120px',
-  color: '#fff',
-  backgroundColor: '#3ba0e9',
-};
+const cx = classNames.bind(styles);
 
 const SideBar = (props) => {
-  return <Sider style={siderStyle}>Sidebar</Sider>;
+  const [state, dispatch] = useStore();
+  return (
+    <Sider className={cx('Sidebar-wrapper')}>
+      <PlusOutlined
+        onClick={() => {
+          dispatch(actions.setMessageData([]));
+        }}
+      />
+    </Sider>
+  );
 };
 
 export default SideBar;
