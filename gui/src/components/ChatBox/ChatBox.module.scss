@@ -4,6 +4,9 @@
   height: 100%;
   background-color: $dark-mode-background-color;
   color: $dark-mode-color;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .Chatbox-wrapper .Chatbox-input-wrapper {
@@ -34,12 +37,15 @@
 }
 
 .Chatbox-wrapper .MessageBox-wrapper {
-  height: 91%;
+  height: 89%;
   overflow-y: scroll;
   border: 1px solid #478a8a;
   padding: 5px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  margin-bottom: 9px;
+}
+
+.Chatbox-wrapper .Chatbox-token-limit {
+  padding-left: 10px;
 }

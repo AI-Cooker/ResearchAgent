@@ -1,51 +1,43 @@
 @import '../GlobalStyles/GlobalStyles.scss';
 
-.Message-divider-user {
-  // color: #0084ff !important;
-  border-color: white !important;
-}
-
-.Message-divider-bot {
-  // color: #3e4042 !important;
-  border-color: white !important;
-}
-
-.Message-name-user {
-  color: white;
-  background-color: #0084ff;
-  padding: 7px 14px;
-  border-radius: 18px;
-}
-
-.Message-name-bot {
-  color: white;
-  background-color: #3e4042;
-  padding: 7px 14px;
-  border-radius: 18px;
-}
-
 .Message-user-wrapper {
   display: flex;
   justify-content: flex-end;
+  margin: 5px 0px;
+  max-width: 100%;
 }
 
 .Message-bot-wrapper {
   display: flex;
   justify-content: flex-start;
+  margin: 5px 0px;
+  max-width: 100%;
 }
 
 .Message-user {
-  text-align: right;
+  text-align: left;
   background-color: #0084ff;
   border-radius: 18px;
-  padding: 7px 14px;
+  padding: 10px 28px;
   width: max-content;
+  max-width: 70%;
+  white-space: pre-line;
+}
+
+.Message-user a {
+  color: blue;
+}
+
+.Message-user a:hover {
+  color: rgb(0, 153, 255);
 }
 
 .Message-bot {
   text-align: left;
   background-color: #3e4042;
   border-radius: 18px;
-  padding: 7px 14px;
+  padding: 10px 28px;
   width: max-content;
+  max-width: 70%;
+  white-space: pre-line;
 }

@@ -4,7 +4,6 @@ import { Input } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import Message from '../Message';
 import { useEffect, useRef, useState } from 'react';
-import { json } from 'react-router-dom';
 
 const { TextArea } = Input;
 const cx = classNames.bind(styles);
@@ -18,18 +17,31 @@ const ChatBox = (props) => {
   };
   initSessionData();
 
+  const maxToken = 2000;
   const [messageInput, setMessageInput] = useState('');
   const [messageData, setMessageData] = useState(JSON.parse(sessionStorage.getItem('data')));
   const bottomMessage = useRef(null);
+  const [limitToken, setLimitToken] = useState(0);
 
   useEffect(() => {
     sessionStorage.setItem('data', JSON.stringify(messageData));
     scrollToBottom();
   }, [messageData.length]);
 
+  useEffect(() => {
+    if (messageInput) {
+      setLimitToken(messageInput.split(' ').length);
+    } else {
+      setLimitToken(0);
+    }
+  }, [messageInput]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageInput) {
+      return;
+    }
+    if (limitToken > maxToken) {
       return;
     }
     setMessageInput('');
@@ -37,12 +49,12 @@ const ChatBox = (props) => {
       messageData.concat([
         {
           position: 'right',
-          message: messageInput,
+          message: `${messageInput}`,
           username: 'Username',
         },
         {
           position: 'left',
-          message: messageInput,
+          message: `${messageInput}`,
           username: 'Bot',
         },
       ]),
@@ -65,6 +77,9 @@ const ChatBox = (props) => {
         })}
         <div ref={bottomMessage}></div>
       </div>
+      <span className={cx('Chatbox-token-limit')}>
+        Limit Token: {limitToken}/{maxToken}
+      </span>
       <div className={cx('Chatbox-input-wrapper')}>
         <TextArea
           className={cx('Chatbox-textarea')}
