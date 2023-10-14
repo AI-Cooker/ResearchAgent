@@ -6,12 +6,6 @@ import time
 import pandas as pd
 
 def main(input_string):
-    # Prompt for search strings
-    # response = prompt(input=input_string, type="search")
-    # df_document = None
-    # for search_string in response[:1]: #For quick testing, just process the first search string 
-    #     print(f"Crawling document for {search_string}")
-    #     df_document = crawl(search_string=search_string, df_document=df_document, max_doc=1)
     problems = prompt(input_string, type="parse")
     problem_urls = {}
     data = {}
@@ -34,14 +28,12 @@ def main(input_string):
                 link = crawl_result["url"]
                 raw_document = crawl_result["document"]
                 title = crawl_result["title"]
-                # print(raw_document)
                 
                 print(f"CLEANING DOCUMENT {title}")
                 clean_kwargs = {"document": raw_document}
                 clean_document = prompt(input=input_string, type="clean", **clean_kwargs)
                 if clean_document:
-                    # print("-"*25 + "CLEANED DOCUMENT" + "-"*25)
-                    print(clean_document)
+                    print("-"*25 + "CLEANED DOCUMENT" + "-"*25)
                     data[problem] = {"documents": [clean_document], "links": [link], "titles": [title]}
                     is_done = True
     analyze_kwargs = {
@@ -55,54 +47,17 @@ def main(input_string):
     else:
         return result
     
-    # clean_documents = []
-    # titles = []
-    # links = []
-    # for idx, url in enumerate(urls):
-    #     print("-"*25 + f"START PROCESSING DOCUMENT {idx}" + "-"*25)
-    #     print(f"URL: {url}")
-    #     crawl_result = get_soup_object(url)
-    #     try:
-    #         if crawl_result["document"] and url not in links:
-    #             link = crawl_result["url"]
-    #             raw_document = crawl_result["document"]
-    #             title = crawl_result["title"]
-    #             # print(raw_document)
-                
-    #             print(f"CLEANING DOCUMENT {title}")
-    #             clean_kwargs = {"document": raw_document}
-    #             clean_document = prompt(input=input_string, type="clean", **clean_kwargs)
-    #             if clean_document:
-    #                 print("-"*25 + "CLEANED DOCUMENT" + "-"*25)
-    #                 print(clean_document)
-    #                 clean_documents.append(clean_document)
-    #                 links.append(link)
-    #                 titles.append(title)
-    #                 print(f"Analyzing documents...")
-    #                 analyze_kwargs = {
-    #                     "documents": clean_documents,
-    #                     "links": links,
-    #                     "titles": titles
-    #                 }
-    #                 result = prompt(input_string, type="analyze", **analyze_kwargs)
-    #                 if not result or "INSUFFICIENT" in result:
-    #                     pass
-    #                 else:
-    #                     return result
-        # except:
-        #     pass
-    
         
-
+# input_string =  "What are the currently best LLMs, provide a quick comparison between them?"
 # input_string = "InsecureRequestWarning: Unverified HTTPS request is being made to host"
 # input_string = "Compare mariadb and postgresql, when should I use them?"
 # input_string = "I have some servers that queries on a single mariadb, one of the server running on highload with high CPU and send a large number of queries to the database, and has very low query response time, but the others still has good response ime, what are the possibly root causes?"
 # input_string = "I have a small application with few tables and the amount of rows is not much, what type of database I should use? What kinds of problems likely to happened?"
-# input_string = "I have a small application with few tables and the amount of rows is not much, what type of database I should use? What kinds of problems likely to happened? Please provide the specific database."
+input_string = "I have a small application with few tables and the amount of rows is not much, what type of database I should use? What kinds of problems likely to happened? Please provide the specific database."
 # input_string = "My application have millions of records that also have high write/read frequency, what type of NoSQL I should use? Recommend me some NoSQL Database for this. I storing document data that are rarely change the structure."
         
-# start = time.time()
-# res = main(input_string)
+start = time.time()
+res = main(input_string)
 # # res = prompt(input_string, type="parse")
 # print("-"*25 + f"RESULT in {round(time.time() - start)}s" + "-"*25)
 # print(res)

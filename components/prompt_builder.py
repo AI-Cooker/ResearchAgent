@@ -124,50 +124,6 @@ def prompt(input: str, type: str, **kwargs):
             print(f"Number of tokens: {input_token_count}")
             if input_token_count > 8192 - 500 or input_token_count < 500:
                 return None
-                # Handle case when the document is too long
-                # document_parts = []
-                # start_idx = 0
-                # while start_idx < len(input) - 2:
-                #     cur_idx = start_idx + 1
-                #     segment_length = palm.count_message_tokens(prompt=input[start_idx: cur_idx])["token_count"]
-                #     while cur_idx < len(input) - 1 and segment_length < 8192 - 500:
-                #         cur_idx += 1
-                #         segment_length = palm.count_message_tokens(prompt=input[start_idx: cur_idx])["token_count"]
-                #     if segment_length < 8192 - 500:
-                #         completion = palm.generate_text(
-                #             **defaults,
-                #             prompt=clean_prompt.format(input[start_idx: cur_idx]),
-                #         )
-                #         if completion.result:
-                #             document_parts.append(completion.result)
-                #     start_idx = cur_idx + 1
-                # if palm.count_message_tokens(prompt=document_parts)["token_count"] < 8192 - 500:
-                #     completion = palm.generate_text(
-                #         **defaults,
-                #         prompt=clean_prompt.format(document_parts),
-                #     )
-                #     if completion.result:
-                #         return completion.result
-                #     else:
-                #         print("Sorry I cannot process your input")
-                #         return None      
-                # else:
-                #     idx = 1
-                #     while idx < len(document_parts) - 1 and palm.count_message_tokens(prompt=document_parts[:idx])["token_count"] < 8192 - 500:
-                #         idx += 1
-                #     if idx > 1:
-                #         completion = palm.generate_text(
-                #             **defaults,
-                #             prompt=clean_prompt.format(document_parts[:idx-1]),
-                #         )
-                #         if completion.result:
-                #             return completion.result
-                #         else:
-                #             print("Sorry I cannot process your input")
-                #             return None  
-                #     else:
-                #         print("Sorry I cannot process your input")
-                #         return None  
             else:
                 final_prompt = clean_prompt.format(input_message=input, document=document)
                 completion = palm.generate_text(
@@ -177,6 +133,7 @@ def prompt(input: str, type: str, **kwargs):
                 if completion.result:
                     return completion.result
                 else:
+                    # print(document)
                     print(f"{type.upper()} Sorry I cannot process your input: {completion}")
                     return None
         except Exception as exc:
@@ -212,36 +169,3 @@ def prompt(input: str, type: str, **kwargs):
         else:
             print(f"{type.upper()} Sorry I cannot process your input: {completion}")
             return None
-        # except Exception as exc:
-        #     print(f"{type.upper()} An error happened during prompting: {exc}")
-        #     return None
-        
-        
-        
-
-# df_documents = pd.read_csv("components\\data\\documents\\rag.csv")
-# clean_documents = []
-
-# for idx, doc in enumerate(df_documents["raw_document"].tolist()):
-#     print(f"Processing file {idx}")
-#     final_prompt = clean_prompt.format(doc)
-#     # print(final_prompt)
-#     completion = palm.generate_text(
-#         **defaults,
-#         prompt=final_prompt,
-#     )
-#     # outputs = [output["output"] for output in completion.candidates]
-#     # for output in outputs:
-#     #     print(output)
-#     #     print("-" * 50)
-#     # print("-" * 50)
-#     # print(completion.result)
-#     if completion.result:
-#         clean_documents.append(completion.result)
-#     else:
-#         clean_documents.append("")
-#         print("Cannot summarize")
-
-# df_documents["clean_document"] = clean_documents
-
-# df_documents.to_csv("components\\data\\documents\\rag.csv")
