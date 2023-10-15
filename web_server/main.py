@@ -1,3 +1,9 @@
+import sys
+sys.path.append("..")
+sys.path.append("../components")
+
+print(sys.path)
+
 import secrets
 from components.main import main
 from components.vector_chromadb import remove_collection
