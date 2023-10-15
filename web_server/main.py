@@ -1,4 +1,6 @@
 import secrets
+from components.main import main
+from components.vector_chromadb import remove_collection
 
 from fastapi import FastAPI, Response, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,7 +40,8 @@ def get_session_id(request: Request, response: Response):
 
 def pass_to_prompt(long_input, session_id):
     # print(f"pass_to_promptpass_to_promptpass_to_promptpass_to_promptpass_to_prompt: long_input={long_input}, session_id={session_id}")
-    return f"answer from long_input={long_input}, session_id={session_id}"
+    # return f"answer from long_input={long_input}, session_id={session_id}"
+    return main(long_input, session_id)
 
 
 class RequestBody(BaseModel):
@@ -60,6 +63,7 @@ async def new_chat(request: Request, response: Response):
     old_session_id = request.cookies.get("Authorization")
     if old_session_id and old_session_id in SESSION_DB:
         SESSION_DB.remove(old_session_id)
+        remove_collection(old_session_id)
     session_id = secrets.token_hex(16)
     SESSION_DB.append(session_id)
     response.set_cookie(
