@@ -2,7 +2,6 @@ import pprint
 from google.generativeai.types.safety_types import HarmBlockThreshold
 from google.generativeai.types.safety_types import HarmCategory
 import google.generativeai as palm
-import pandas as pd
 import ast
 from tenacity import retry, stop_after_attempt
 
