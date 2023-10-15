@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import styles from './Message.module.scss';
 import classNames from 'classnames/bind';
 import Markdown from 'react-markdown';

@@ -4,6 +4,8 @@ import { Input } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import Message from '../Message';
 import { useEffect, useRef, useState } from 'react';
+import { useStore, actions } from '~/store';
+import { setMessageData } from '~/store/actions';
 
 const { TextArea } = Input;
 const cx = classNames.bind(styles);
@@ -18,10 +20,11 @@ const ChatBox = (props) => {
   initSessionData();
 
   const maxToken = 2000;
+  const [state, dispatch] = useStore();
   const [messageInput, setMessageInput] = useState('');
-  const [messageData, setMessageData] = useState(JSON.parse(sessionStorage.getItem('data')));
-  const bottomMessage = useRef(null);
   const [limitToken, setLimitToken] = useState(0);
+  const bottomMessage = useRef(null);
+  const { messageData, currentSessionId } = state;
 
   useEffect(() => {
     sessionStorage.setItem('data', JSON.stringify(messageData));
@@ -36,7 +39,7 @@ const ChatBox = (props) => {
     }
   }, [messageInput]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!messageInput) {
       return;
@@ -45,20 +48,34 @@ const ChatBox = (props) => {
       return;
     }
     setMessageInput('');
-    setMessageData(
-      messageData.concat([
-        {
-          position: 'right',
-          message: `${messageInput}`,
-          username: 'Username',
-        },
-        {
-          position: 'left',
-          message: `${messageInput}`,
-          username: 'Bot',
-        },
-      ]),
-    );
+    await fetch('http://127.0.0.1:8000/ask_question', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_input: messageInput }),
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) =>
+        dispatch(
+          setMessageData(
+            messageData.concat([
+              {
+                position: 'right',
+                message: `${messageInput}`,
+                username: 'Username',
+              },
+              {
+                position: 'left',
+                message: `${data['answer']}`,
+                username: 'Bot',
+              },
+            ]),
+          ),
+        ),
+      );
   };
 
   const scrollToBottom = () => {
@@ -78,7 +95,7 @@ const ChatBox = (props) => {
         <div ref={bottomMessage}></div>
       </div>
       <span className={cx('Chatbox-token-limit')}>
-        Limit Token: {limitToken}/{maxToken}
+        Limit Token: {limitToken}/{maxToken} Current Session: {currentSessionId}
       </span>
       <div className={cx('Chatbox-input-wrapper')}>
         <TextArea

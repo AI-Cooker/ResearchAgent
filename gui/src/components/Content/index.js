@@ -18,12 +18,12 @@ const Content = (props) => {
   };
 
   return (
-    <Layout hasSider className={cx("Content-wrapper")}>
+    <Layout hasSider className={cx('Content-wrapper')}>
       {isShowSideBar ? <SideBar /> : null}
       {isShowSideBar ? (
-        <LeftOutlined style={{ cursor: 'pointer', backgroundColor: '#3ba0e9' }} onClick={handleShowSidebar} />
+        <LeftOutlined className={cx('Content-button')} onClick={handleShowSidebar} />
       ) : (
-        <RightOutlined style={{ cursor: 'pointer', backgroundColor: '#3ba0e9' }} onClick={handleShowSidebar} />
+        <RightOutlined className={cx('Content-button')} onClick={handleShowSidebar} />
       )}
       <ContentAntd>
         <ChatBox />
