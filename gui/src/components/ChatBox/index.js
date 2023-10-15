@@ -1,33 +1,47 @@
 import classNames from 'classnames/bind';
 import styles from './ChatBox.module.scss';
-import { Input } from 'antd';
+import { Input, Spin, Tooltip } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import Message from '../Message';
 import { useEffect, useRef, useState } from 'react';
-import { useStore, actions } from '~/store';
-import { setMessageData } from '~/store/actions';
+import { useStore } from '~/store';
+import { setCurrentSession, setMessageData } from '~/store/actions';
 
 const { TextArea } = Input;
 const cx = classNames.bind(styles);
 
 const ChatBox = (props) => {
-  const initSessionData = () => {
-    const data = sessionStorage.getItem('data');
-    if (!data) {
-      sessionStorage.setItem('data', JSON.stringify([]));
+  const initSessionKey = () => {
+    if (!sessionStorage.getItem('history')) {
+      sessionStorage.setItem('history', JSON.stringify([]));
+    }
+    if (!sessionStorage.getItem('currentSessionId')) {
+      sessionStorage.setItem('currentSessionId', '');
     }
   };
-  initSessionData();
+  initSessionKey();
 
   const maxToken = 2000;
   const [state, dispatch] = useStore();
   const [messageInput, setMessageInput] = useState('');
   const [limitToken, setLimitToken] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const bottomMessage = useRef(null);
   const { messageData, currentSessionId } = state;
 
   useEffect(() => {
-    sessionStorage.setItem('data', JSON.stringify(messageData));
+    const storageId = sessionStorage.getItem('currentSessionId');
+    dispatch(setCurrentSession(storageId));
+    const storageMessageData = JSON.parse(sessionStorage.getItem(storageId));
+    if (storageMessageData) {
+      dispatch(setMessageData(storageMessageData));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentSessionId) {
+      sessionStorage.setItem(currentSessionId, JSON.stringify(messageData));
+    }
     scrollToBottom();
   }, [messageData.length]);
 
@@ -40,6 +54,7 @@ const ChatBox = (props) => {
   }, [messageInput]);
 
   const handleSendMessage = async (e) => {
+    const currentMessageData = messageData;
     e.preventDefault();
     if (!messageInput) {
       return;
@@ -48,7 +63,14 @@ const ChatBox = (props) => {
       return;
     }
     setMessageInput('');
-    await fetch('http://127.0.0.1:8000/ask_question', {
+    currentMessageData.push({
+      position: 'right',
+      message: `${messageInput}`,
+      username: 'Username',
+    });
+    dispatch(setMessageData(currentMessageData));
+    setIsLoading(true);
+    await fetch('http://localhost:5690/ask_question', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -58,24 +80,15 @@ const ChatBox = (props) => {
       credentials: 'include',
     })
       .then((res) => res.json())
-      .then((data) =>
-        dispatch(
-          setMessageData(
-            messageData.concat([
-              {
-                position: 'right',
-                message: `${messageInput}`,
-                username: 'Username',
-              },
-              {
-                position: 'left',
-                message: `${data['answer']}`,
-                username: 'Bot',
-              },
-            ]),
-          ),
-        ),
-      );
+      .then((data) => {
+        currentMessageData.push({
+          position: 'left',
+          message: `${data['answer']}`,
+          username: 'Bot',
+        });
+        dispatch(setMessageData(currentMessageData));
+        setIsLoading(false);
+      });
   };
 
   const scrollToBottom = () => {
@@ -92,20 +105,28 @@ const ChatBox = (props) => {
         {messageData.map((value, index) => {
           return <Message key={index} position={value.position} message={value.message} username={value.username} />;
         })}
+        {isLoading ? <Spin style={{ textAlign: 'left', padding: '10px' }}></Spin> : null}
         <div ref={bottomMessage}></div>
       </div>
       <span className={cx('Chatbox-token-limit')}>
         Limit Token: {limitToken}/{maxToken} Current Session: {currentSessionId}
       </span>
       <div className={cx('Chatbox-input-wrapper')}>
-        <TextArea
-          className={cx('Chatbox-textarea')}
-          autoSize={{ minRows: 1, maxRows: 2 }}
-          onChange={handleMessageInput}
-          value={messageInput}
-          placeholder="Enter your question..."
-        />
-        <SendOutlined className={cx('Chatbox-send-button')} onClick={handleSendMessage} />
+        <Tooltip title={currentSessionId ? null : 'Create new session first'}>
+          <TextArea
+            className={cx('Chatbox-textarea')}
+            autoSize={{ minRows: 1, maxRows: 2 }}
+            onChange={handleMessageInput}
+            value={messageInput}
+            placeholder="Enter your question..."
+            disabled={!currentSessionId || isLoading ? true : false}
+          />
+        </Tooltip>
+        {!currentSessionId || isLoading ? (
+          <SendOutlined className={cx('Chatbox-send-button')} style={{ cursor: 'not-allowed' }} />
+        ) : (
+          <SendOutlined className={cx('Chatbox-send-button')} onClick={handleSendMessage} />
+        )}
       </div>
     </div>
   );

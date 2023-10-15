@@ -24,3 +24,10 @@
   margin: 6px 0px;
   overflow: hidden;
 }
+
+.Sidebar-modal {
+  max-height: 50vh;
+  background-color: #212121;
+  padding: 5px;
+  overflow-y: auto;
+}
