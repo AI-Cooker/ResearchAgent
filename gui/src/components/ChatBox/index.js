@@ -48,7 +48,7 @@ const ChatBox = (props) => {
       return;
     }
     setMessageInput('');
-    await fetch('http://127.0.0.1:8000/ask_question', {
+    await fetch('http://127.0.0.1:5690/ask_question', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
