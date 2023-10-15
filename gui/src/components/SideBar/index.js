@@ -16,7 +16,7 @@ const SideBar = (props) => {
   const handleNewSession = async (e) => {
     e.preventDefault();
     dispatch(actions.setMessageData([]));
-    await fetch('http://127.0.0.1:8000/new_chat', { method: 'POST' })
+    await fetch('http://127.0.0.1:8000/new_chat', { method: 'POST', credentials: 'include' })
       .then((res) => res.json())
       .then((data) => {
         const sessionId = data['session_id'];
