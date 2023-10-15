@@ -1,11 +1,26 @@
 import secrets
 
 from fastapi import FastAPI, Response, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI()
 
 SESSION_DB = []
+
+# origins = [
+#     "http://localhost:*",
+#     "http://localhost:3000",
+# ]
+
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins=origins,
+    allow_origin_regex=r"http://localhost:.*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_session_id(request: Request, response: Response):
@@ -15,7 +30,9 @@ def get_session_id(request: Request, response: Response):
         # print("Create ano ther new sesisinoonnnn")
         session_id = secrets.token_hex(16)
         SESSION_DB.append(session_id)
-        response.set_cookie(key="Authorization", value=session_id)
+        response.set_cookie(
+            key="Authorization", value=session_id, samesite="none", secure=True
+        )
     return session_id
 
 
@@ -45,5 +62,7 @@ async def new_chat(request: Request, response: Response):
         SESSION_DB.remove(old_session_id)
     session_id = secrets.token_hex(16)
     SESSION_DB.append(session_id)
-    response.set_cookie(key="Authorization", value=session_id)
+    response.set_cookie(
+        key="Authorization", value=session_id, samesite="none", secure=True
+    )
     return {"session_id": session_id}
