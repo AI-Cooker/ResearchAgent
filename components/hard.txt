@@ -1,0 +1,20 @@
+Design a distributed system for a ride-sharing service like Uber or Lyft. Consider scalability, fault tolerance, and low-latency requirements. How would you handle issues like driver allocation and matching, real-time tracking, and surge pricing?
+Explain how you would design a search engine like Google. Discuss the data structures and algorithms you would use to index web pages, rank search results, and handle queries efficiently.
+Design a recommendation system for an e-commerce platform like Amazon or a content platform like Netflix. Explain how you would use collaborative filtering, content-based filtering, and machine learning techniques to provide personalized recommendations.
+Describe the architecture and components of a blockchain system. Discuss the consensus mechanism, smart contracts, and their real-world applications in industries like finance, supply chain, and healthcare.
+You're tasked with optimizing a large, slow-performing database for an e-commerce website. Discuss various strategies for improving database performance, including indexing, query optimization, and denormalization.
+Imagine you're a security consultant for a major financial institution. Explain how you would conduct a security vulnerability assessment, identify potential threats, and recommend mitigation strategies to protect sensitive customer data.
+You've developed a state-of-the-art machine learning model for image recognition. Describe how you would deploy this model in a production environment, considering issues like scalability, latency, and model retraining.
+A company wants to migrate its on-premises infrastructure to the cloud. Discuss the steps involved, including assessing the existing infrastructure, selecting a cloud provider, designing a scalable architecture, and ensuring data security during migration.
+Explain the process scheduling algorithm in modern operating systems. Discuss the trade-offs between different scheduling policies (e.g., round-robin, priority-based) and their real-world implications for performance and fairness.
+Explain the fundamental principles of quantum computing and how it differs from classical computing. Describe a real-world problem that could benefit from quantum computing and outline a high-level solution.
+Develop an AI-driven chatbot capable of conducting a conversation on a complex technical topic, such as quantum physics. Discuss the underlying NLP techniques and challenges in creating this chatbot.
+Explain the differences between containerization platforms like Docker and container orchestration tools like Kubernetes. Describe a use case where you'd choose one over the other.
+Discuss the importance of explainable AI and how it can be integrated into a machine learning model. Provide an example of a real-world application where XAI is crucial.
+Explain the concept of blockchain interoperability and provide a solution for enabling seamless communication between different blockchain networks. Discuss the use cases and challenges associated with blockchain interoperability.
+Describe the CAP theorem and its implications on distributed systems. Discuss scenarios where you might prioritize consistency over availability or vice versa.
+Compare and contrast microservices and monolithic architectures. Explain when it's advantageous to use one over the other, and the challenges associated with each.
+Define CI/CD and discuss its significance in modern software development. Describe the key components of a CI/CD pipeline and how it benefits the development process.
+Explain each of the SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion) and provide examples of how they improve software design and maintainability.
+Discuss the Observer design pattern and provide an example of a real-world application where it is useful. Explain how it decouples components in software design.
+Discuss the characteristics of NoSQL databases and their benefits compared to traditional relational databases. Also, mention scenarios where NoSQL databases may not be the best choice.

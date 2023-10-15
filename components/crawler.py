@@ -2,6 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 from googlesearch import search  
 import re 
+from goose3 import Goose
+
+# from requests_html import HTMLSession
+# session = HTMLSession()
 
 def get_urls(text_search, num_of_page=10):
     # to search 
@@ -13,22 +17,23 @@ def get_urls(text_search, num_of_page=10):
     return links
 
 def crawler(url):
-    headers = {'content-type': 'application/json',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'}
-    
-    data = requests.get(url, headers=headers, verify=False)
-    soup = BeautifulSoup(data.content, "lxml")
+    g = Goose()
+    data = g.extract(url)
+    soup = BeautifulSoup(data.raw_html, "lxml")
     title = soup.title.text
+    
     return soup, title
-
 
 def get_soup_object(url):
     row = {}
     try:
         soup, title = crawler(url)
         row['title'] = title
-        row['document'] = re.sub(r"\n\s*\n", "\n", soup.get_text(), flags=re.MULTILINE)
+        lines = re.sub(r"\n\s*\n", "\n", soup.get_text(), flags=re.MULTILINE)
+        lines = "".join(lines)
+        lines = lines.split("\n")
+        lines = "\n".join([line for line in lines if len(line.strip().split(" ")) > 15])
+        row['document'] = lines
     except Exception as e:
         row['title'] = None
         row['document'] = None
