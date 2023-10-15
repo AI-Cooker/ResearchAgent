@@ -1,8 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './components/Home';
+
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">AI Cooker</header>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Home></Home>} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

@@ -1,0 +1,12 @@
+@import '../GlobalStyles/GlobalStyles.scss';
+
+.Content-wrapper {
+  height: 90%;
+}
+
+.Content-button {
+  cursor: pointer;
+  background-color: $dark-mode-background-color;
+  color: $dark-mode-color;
+  font-size: 20px;
+}
