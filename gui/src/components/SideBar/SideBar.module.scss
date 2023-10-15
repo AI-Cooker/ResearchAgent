@@ -1,0 +1,26 @@
+@import '../GlobalStyles/GlobalStyles.scss';
+
+.Sidebar-wrapper {
+  color: $dark-mode-color;
+  background-color: $dark-mode-background-color !important;
+  border-radius: 5px;
+  border: 1px solid #478a8a;
+  font-size: 20px;
+  text-align: center;
+  padding: 10px 5px;
+}
+
+.Sidebar-wrapper .Sidebar-divider {
+  background-color: #478a8a;
+  margin: 12px 0px;
+}
+
+.Sidebar-button {
+  background-color: #212121;
+  color: white;
+  border-color: #478a8a;
+  max-width: 90%;
+  width: 90%;
+  margin: 6px 0px;
+  overflow: hidden;
+}
