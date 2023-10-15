@@ -1,0 +1,12 @@
+What are the new and popular tools for data analysis?
+What are the trending research topics in computer science?
+What is the difference between a stack and a queue?
+What is the difference between an abstract class and an interface?
+What is the difference between a primary key and a foreign key?
+What is the difference between a linked list and an array?
+What is the difference between a binary tree and a binary search tree?
+What is the difference between an inner join and an outer join?
+What is the difference between a compiler and an interpreter?
+What is the difference between a mutex and a semaphore?
+What is the difference between a process and a thread?
+What is the difference between synchronous and asynchronous programming?

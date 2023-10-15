@@ -1,5 +1,0 @@
-My application have millions of records that also have high write/read frequency, what type of NoSQL I should use? Recommend me some NoSQL Database for this. I storing document data that are rarely change the structure.
-What are the current best LLM models, what should I use when I need to perform NLP tasks: like summarization, question answering,...?
-My application have too many queries on a few tables, come from many services, what should I do to improve the performance of the system?
-What are the most popular software development methodologies? What should I use when my team is small and the project's requirement is rarely change?
-What are the most popular problems when using in-memory cached like memcached? How can I prevent it?

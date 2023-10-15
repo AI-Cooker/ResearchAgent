@@ -20,7 +20,6 @@ def crawler(url):
     title = soup.title.text
     return article.cleaned_text, title
 
-
 def get_soup_object(url):
     row = {}
     try:
